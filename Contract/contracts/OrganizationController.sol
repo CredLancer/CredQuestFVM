@@ -12,13 +12,15 @@ contract OrganizationController is Ownable, Pausable {
         address admin;
     }
 
-    mapping(uint256 => Organization) public organizations;
+    mapping(uint256 => Organization) public organizations; // f: (organizationId) -> organization
+    mapping(address => uint256) public organizationIds; // f: (adminAddress) -> organizationId
 
     uint256 public totalOrganizations;
 
     error Unauthorized();
     error InvalidOrganizationId();
     error ZeroAddressCannotBeAdmin();
+    error OrganizationsPerAddressLimitReached();
 
     event OrganizationCreated(
         uint256 indexed orgId,
@@ -43,7 +45,7 @@ contract OrganizationController is Ownable, Pausable {
     );
 
     modifier onlyAdmin(uint256 orgId) {
-        if (orgId >= totalOrganizations) revert InvalidOrganizationId();
+        if (!exists(orgId)) revert InvalidOrganizationId();
         if (organizations[orgId].admin != msg.sender) revert Unauthorized();
         _;
     }
@@ -60,7 +62,9 @@ contract OrganizationController is Ownable, Pausable {
         public
         whenNotPaused
     {
-        uint256 orgId = totalOrganizations++;
+        if (organizationIds[msg.sender] != 0)
+            revert OrganizationsPerAddressLimitReached();
+        uint256 orgId = ++totalOrganizations;
         organizations[orgId] = Organization({
             id: orgId,
             name: name,
@@ -96,16 +100,18 @@ contract OrganizationController is Ownable, Pausable {
         onlyAdmin(orgId)
     {
         if (newAdmin == address(0)) revert ZeroAddressCannotBeAdmin();
+        if (organizationIds[newAdmin] != 0)
+            revert OrganizationsPerAddressLimitReached();
         organizations[orgId].admin = newAdmin;
         emit AdminChanged(orgId, msg.sender, newAdmin);
     }
 
     function adminOf(uint256 orgId) public view returns (address admin) {
-        if (orgId >= totalOrganizations) revert InvalidOrganizationId();
+        if (!exists(orgId)) revert InvalidOrganizationId();
         admin = organizations[orgId].admin;
     }
 
     function exists(uint256 orgId) public view returns (bool) {
-        return orgId < totalOrganizations;
+        return orgId <= totalOrganizations && orgId != 0;
     }
 }
