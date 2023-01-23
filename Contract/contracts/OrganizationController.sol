@@ -27,6 +27,16 @@ contract OrganizationController is Ownable, Pausable {
         address admin
     );
     event AdminChanged(uint256 orgId, address oldAdmin, address newAdmin);
+    event OrganizationNameChanged(
+        uint256 orgId,
+        string oldName,
+        string newName
+    );
+    event OrganizationImageCIDChanged(
+        uint256 orgId,
+        bytes oldImageCID,
+        bytes newImageCID
+    );
 
     modifier onlyAdmin(uint256 orgId) {
         if (orgId >= totalOrganizations) revert InvalidOrganizationId();
@@ -54,6 +64,26 @@ contract OrganizationController is Ownable, Pausable {
             admin: msg.sender
         });
         emit OrganizationCreated(orgId, name, imageCID, msg.sender);
+    }
+
+    function updateName(uint256 orgId, string calldata newName)
+        public
+        whenNotPaused
+        onlyAdmin(orgId)
+    {
+        string memory oldName = organizations[orgId].name;
+        organizations[orgId].name = newName;
+        emit OrganizationNameChanged(orgId, oldName, newName);
+    }
+
+    function updateImageCID(uint256 orgId, bytes calldata newImageCID)
+        public
+        whenNotPaused
+        onlyAdmin(orgId)
+    {
+        bytes memory oldImageCID = organizations[orgId].imageCID;
+        organizations[orgId].imageCID = newImageCID;
+        emit OrganizationImageCIDChanged(orgId, oldImageCID, newImageCID);
     }
 
     function changeAdmin(uint256 orgId, address newAdmin)
