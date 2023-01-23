@@ -21,19 +21,23 @@ contract OrganizationController is Ownable, Pausable {
     error ZeroAddressCannotBeAdmin();
 
     event OrganizationCreated(
-        uint256 orgId,
+        uint256 indexed orgId,
+        address indexed admin,
         string name,
-        bytes imageCID,
-        address admin
+        bytes imageCID
     );
-    event AdminChanged(uint256 orgId, address oldAdmin, address newAdmin);
+    event AdminChanged(
+        uint256 indexed orgId,
+        address indexed oldAdmin,
+        address indexed newAdmin
+    );
     event OrganizationNameChanged(
-        uint256 orgId,
+        uint256 indexed orgId,
         string oldName,
         string newName
     );
     event OrganizationImageCIDChanged(
-        uint256 orgId,
+        uint256 indexed orgId,
         bytes oldImageCID,
         bytes newImageCID
     );
@@ -63,7 +67,7 @@ contract OrganizationController is Ownable, Pausable {
             imageCID: imageCID,
             admin: msg.sender
         });
-        emit OrganizationCreated(orgId, name, imageCID, msg.sender);
+        emit OrganizationCreated(orgId, msg.sender, name, imageCID);
     }
 
     function updateName(uint256 orgId, string calldata newName)
