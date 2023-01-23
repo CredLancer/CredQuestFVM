@@ -71,6 +71,7 @@ contract OrganizationController is Ownable, Pausable {
             imageCID: imageCID,
             admin: msg.sender
         });
+        organizationIds[msg.sender] = orgId;
         emit OrganizationCreated(orgId, msg.sender, name, imageCID);
     }
 
