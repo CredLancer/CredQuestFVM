@@ -10,9 +10,12 @@ on:
     branches: [ "main", "SmartContract" ]
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
+    
+    defaults:
+      run:
+        working-directory: ./Contract
 
     strategy:
       matrix:
@@ -26,5 +29,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+    - run: echo PRIVATE_KEY="0x1884c0ffa2ff66c09254182940ae7b1b70cc3f3bfe0792bd5357919d856f8007" >> .env
     - run: npm ci
     - run: npm run coverage
