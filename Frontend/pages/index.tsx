@@ -7,8 +7,7 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { useState } from "react";
 import { SelectRoleModal } from "../components/Modals/SelectRole";
 
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 type QuestType = "create-quest" | "join-quest" | undefined;
 
@@ -31,11 +30,6 @@ const CallToAction = () => {
       <Heading fontFamily="Alvotica" color="purple.1">
         Join a Quest Find your Soul Bound Tribe
       </Heading>
-
-      <Flex alignItems="center" justifyContent="center" gap="8" marginTop="10">
-        <ConnectButton />
-      </Flex>
-
 
       <Flex alignItems="center" justifyContent="center" gap="8" marginTop="10">
         <Button
