@@ -9,13 +9,14 @@ on:
   pull_request:
     branches: [ "main", "SmartContract" ]
 
+
+defaults:
+  run:
+    working-directory: ./Contract
+
 jobs:
   test:
     runs-on: ubuntu-latest
-    
-    defaults:
-      run:
-        working-directory: ./Contract
 
     strategy:
       matrix:
