@@ -1,69 +1,64 @@
-import { Button, Link } from '@chakra-ui/react'
-import type { NextPage } from 'next'
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
-import { useSendTransaction } from 'wagmi'
-import { BigNumber } from '@ethersproject/bignumber'
+import { Box, Button, Container, Flex, Heading, Link } from "@chakra-ui/react";
+import type { NextPage } from "next";
+import Head from "next/head";
+import styles from "../styles/Home.module.css";
+import { useAccount, useSendTransaction } from "wagmi";
+import { BigNumber } from "@ethersproject/bignumber";
+import { useState } from "react";
+import { SelectRoleModal } from "../components/Modals/SelectRole";
 
-const Home: NextPage = () => {
+type QuestType = "create-quest" | "join-quest" | undefined;
 
-  const { data, isIdle, isError, isLoading, isSuccess, sendTransaction } =
-    useSendTransaction({
-      request: {
-        to: 'yanniksood.eth',
-        value: BigNumber.from('10000000000000000'), // .1 ETH
-      },
-    })
+const CallToAction = () => {
+  const { isConnected, address } = useAccount();
+  const [openModal, setOpen] = useState<QuestType>();
+  const handleCreateQuest = () => {
+    setOpen("create-quest");
+  };
+  const handleJoinQuest = () => {
+    setOpen("join-quest");
+  };
+
+  if (openModal) {
+    return <SelectRoleModal handleClose={() => setOpen(undefined)} />;
+  }
 
   return (
-    <div className={styles.container}>
-      <Head>
-        <title>DApp Boilerplate</title>
-        <meta name="description" content="ETH + Next.js DApp Boilerplate by ilyxium" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    <Box padding="12">
+      <Heading fontFamily="Alvotica" color="purple.1">
+        Join a Quest Find your Soul Bound Tribe
+      </Heading>
 
-      <main className={styles.main}>
-        <h2 className={styles.title}>
-          Welcome
-        </h2>
+      <Flex alignItems="center" justifyContent="center" gap="8" marginTop="10">
+        <Button
+          onClick={() => handleCreateQuest()}
+          disabled={!isConnected || !address}
+          colorScheme="blue"
+          type="button"
+        >
+          Create a Quest
+        </Button>
 
-        <div className={styles.grid}>
-          <Link href='https://twitter.com/yanniksood' isExternal>
-            <Button
-              backgroundColor="#BB86FC"
-              borderRadius="25px"
-              margin={2.5}
-              _hover={{
-                bg: '#121212'
-              }}
-              _active={{
-                bg: '#121212'
-              }}
-            >
-              <p>Follow me on twitter</p>
-            </Button>
-          </Link>
-          
+        <Button
+          colorScheme="blue"
+          disabled={!isConnected || !address}
+          onClick={handleJoinQuest}
+          type="button"
+          variant="outline"
+        >
+          Join a Quest
+        </Button>
+      </Flex>
+    </Box>
+  );
+};
 
-          <Button
-              backgroundColor="#32CD32"
-              borderRadius="25px"
-              margin={2.5}
-              _hover={{
-                bg: '#121212'
-              }}
-              _active={{
-                bg: '#121212'
-              }}
-              onClick={() => sendTransaction()}
-            >
-              <p>Donate some ETH</p>
-            </Button>
-        </div>
-      </main>
-    </div>
-  )
-}
+const Home: NextPage = () => {
+  return (
+    <Container>
+      <CallToAction />
+    </Container>
+  );
+};
 
-export default Home
+export default Home;
