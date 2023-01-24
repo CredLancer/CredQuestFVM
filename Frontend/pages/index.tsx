@@ -9,6 +9,10 @@ import { SelectRoleModal } from "../components/Modals/SelectRole";
 
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
+import { TribeMembers } from "../components/TribeMembers";
+import { CompletedQuests } from "../components/CompletedQuests";
+
+
 type QuestType = "create-quest" | "join-quest" | undefined;
 
 const CallToAction = () => {
@@ -29,7 +33,7 @@ const CallToAction = () => {
   }
 
   return (
-    <Box padding="12">
+    <Box padding="12" minH="md" mt="200px">
       <Heading fontFamily="Alvotica" textAlign="center" color="purple.1">
         Join a Quest Find your Soul Bound Tribe
       </Heading>
@@ -60,9 +64,13 @@ const CallToAction = () => {
 
 const Home: NextPage = () => {
   return (
+    <>
     <Container>
       <CallToAction />
     </Container>
+    <CompletedQuests />
+    <TribeMembers />
+    </>
   );
 };
 

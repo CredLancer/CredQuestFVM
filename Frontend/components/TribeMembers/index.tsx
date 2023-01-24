@@ -23,6 +23,8 @@ import {
     >
       <Box
         bg="black"
+        maxW="6xl"
+        mx="auto"
         height="45px"
         borderWidth='1px'
         borderColor='white'
@@ -30,11 +32,11 @@ import {
       </Box>
       <Box
         bg="#71DCCC"
-        width="6xl"
+        maxW="6xl"
         mx="auto"
         borderWidth='1px'
         borderColor='white'
-          px={{ base: '4', md: '8', lg: '12' }}
+        px={{ base: '4', md: '8', lg: '12' }}
         py={{ base: '6', md: '8', lg: '12' }}
       >
         <Stack spacing={{ base: '8', md: '12', lg: '16' }}>
