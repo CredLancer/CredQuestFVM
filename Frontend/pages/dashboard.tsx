@@ -22,8 +22,8 @@ import { SelectRoleModal } from "../components/Modals/SelectRole";
 
 const Dashboard: NextPage = () => {
   return (
-    <Container paddingY="2em">
-      <Box maxW="700px" marginX="auto" mt="12" border="1px solid white">
+    <Container maxW="6xl" paddingY="2em">
+      <Box maxW="100%" marginX="auto" mt="12" border="1px solid white">
         <Flex
           backgroundColor="white"
           alignItems="flex-end"
