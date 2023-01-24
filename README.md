@@ -1,4 +1,4 @@
-CredQuest
+CredQuest Marketplace for CredLancer
 
 CredLancer: a digital reputation network that verifies accomplishments & skills. Orgs issue tamper-proof credentials to members & freelancers who accomplish bounty secured quests. With AI integrations, freelancers can showcase real-time skill and professional development credentials, stored and verified with IPFS & FVM.
 
