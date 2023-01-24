@@ -22,6 +22,13 @@ import {
     py={{ base: '6', md: '8', lg: '12' }}
     >
       <Box
+        bg="black"
+        height="45px"
+        borderWidth='1px'
+        borderColor='white'
+        >
+      </Box>
+      <Box
         bg="#71DCCC"
         width="6xl"
         mx="auto"
