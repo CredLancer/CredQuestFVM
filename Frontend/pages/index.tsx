@@ -67,7 +67,7 @@ const CallToAction = () => {
 
 const Home: NextPage = () => {
   return (
-    <Box bgGradient='linear(#71DCCC 0%, #29116c 80%, )'>
+    <Box bgGradient='linear(#71DCCC 0%, #71DCCC 25%, #29116c 50%, )'>
     <Container>
       <CallToAction />
     </Container>
