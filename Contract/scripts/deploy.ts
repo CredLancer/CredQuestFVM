@@ -1,18 +1,33 @@
 import { ethers } from "hardhat";
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+  // get provider
+  const { provider } = ethers;
 
-  const lockedAmount = ethers.utils.parseEther("1");
+  // deploy the organizations contract
+  console.log("Deploying the organization contract");
+  const OrganizationController = await ethers.getContractFactory(
+    "OrganizationController"
+  );
+  const organizationController = await OrganizationController.deploy({
+    maxPriorityFeePerGas: await provider.send("eth_maxPriorityFeePerGas", []),
+  });
+  console.log(
+    `The organization contract is deployed to address: ${organizationController.address}`
+  );
 
-  const Lock = await ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
-
-  await lock.deployed();
-
-  console.log(`Lock with 1 ETH and unlock timestamp ${unlockTime} deployed to ${lock.address}`);
+  // deploy the quests contract
+  console.log("Deploying the quest contract");
+  const QuestController = await ethers.getContractFactory("QuestController");
+  const questController = await QuestController.deploy(
+    organizationController.address,
+    {
+      maxPriorityFeePerGas: await provider.send("eth_maxPriorityFeePerGas", []),
+    }
+  );
+  console.log(
+    `The quest contract is deployed to address: ${questController.address}`
+  );
 }
 
 // We recommend this pattern to be able to use async/await everywhere
