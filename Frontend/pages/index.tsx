@@ -7,8 +7,7 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { useState } from "react";
 import { SelectRoleModal } from "../components/Modals/SelectRole";
 
-import { ConnectButton } from '@rainbow-me/rainbowkit';
-
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 type QuestType = "create-quest" | "join-quest" | undefined;
 
@@ -22,25 +21,23 @@ const CallToAction = () => {
     setOpen("join-quest");
   };
 
+  const disabled = !isConnected || !address;
+  console.log({ disabled });
+
   if (openModal) {
     return <SelectRoleModal handleClose={() => setOpen(undefined)} />;
   }
 
   return (
     <Box padding="12">
-      <Heading fontFamily="Alvotica" color="purple.1">
+      <Heading fontFamily="Alvotica" textAlign="center" color="purple.1">
         Join a Quest Find your Soul Bound Tribe
       </Heading>
 
       <Flex alignItems="center" justifyContent="center" gap="8" marginTop="10">
-        <ConnectButton />
-      </Flex>
-
-
-      <Flex alignItems="center" justifyContent="center" gap="8" marginTop="10">
         <Button
           onClick={() => handleCreateQuest()}
-          disabled={!isConnected || !address}
+          disabled={disabled}
           colorScheme="blue"
           type="button"
         >
@@ -49,7 +46,7 @@ const CallToAction = () => {
 
         <Button
           colorScheme="blue"
-          disabled={!isConnected || !address}
+          disabled={disabled}
           onClick={handleJoinQuest}
           type="button"
           variant="outline"
