@@ -1,0 +1,36 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Smart Contract Tests
+
+on:
+  push:
+    branches: [ "main", "SmartContract" ]
+  pull_request:
+    branches: [ "main", "SmartContract" ]
+
+
+defaults:
+  run:
+    working-directory: ./Contract
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        cache-dependency-path: './Contract/package-lock.json'
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    - run: echo PRIVATE_KEY="0x1884c0ffa2ff66c09254182940ae7b1b70cc3f3bfe0792bd5357919d856f8007" >> .env
+    - run: npm ci
+    - run: npm run coverage
