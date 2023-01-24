@@ -9,3 +9,31 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model Organization {
+  id          String  @id
+  admin       String
+  name        String
+  imageCID    String
+  imageURL    String?
+  description String?
+  video       String?
+}
+
+enum OrganizationDetailUpdateType {
+  AdminChange
+  NameChange
+  ImageCIDChange
+}
+
+model OrganizationDetailUpdate {
+  transactionHash  String
+  blockNumber      Int
+  transactionIndex Int
+  logIndex         Int
+  type             OrganizationDetailUpdateType
+  from             String
+  to               String
+
+  @@id([transactionHash, blockNumber, transactionIndex, logIndex])
+}
