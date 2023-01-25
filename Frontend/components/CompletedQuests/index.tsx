@@ -23,6 +23,8 @@ import {
   >
     <Box
       bg="black"
+      maxW="6xl"
+      mx="auto"
       height="45px"
       borderWidth='1px'
       borderColor='white'

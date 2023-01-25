@@ -23,9 +23,9 @@ export const Page: FC<{ children?: React.ReactNode }> = ({ children }) => {
     <>
       <Flex direction="column">
         <Header />
-        <main>{children}</main>
-        <CompletedQuests />
-        <TribeMembers />
+          <>
+            {children}
+          </>
         <Footer />
       </Flex>
     </>

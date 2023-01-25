@@ -29,13 +29,16 @@ import {
         key={completedQuest.name}
         borderRadius="xl"
         overflow="hidden"
-        minH={{ base: 'sm', lg: 'auto' }}
+        maxW="sm"
+        width={{ base: 'xm', lg: 'xm' }}
+        minH={{ base: 'sm', lg: 'sm' }}
         {...rootProps}
       >
         <Link>
           <Image
             src={completedQuest.imageUrl}
-            height="full"
+            height="250px"
+            mx="auto"
             objectFit="cover"
             alt={completedQuest.name}
             fallback={<Skeleton />}

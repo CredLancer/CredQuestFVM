@@ -30,6 +30,8 @@ import {
         key={tribeMember.name}
         borderRadius="3xl"
         overflow="hidden"
+        maxW="sm"
+        width={{ base: 'xm', lg: 'xm' }}
         height={{ base: 'sm', lg: 'sm' }}
         {...rootProps}
       >
