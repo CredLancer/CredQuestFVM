@@ -11,6 +11,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 import { TribeMembers } from "../components/TribeMembers";
 import { CompletedQuests } from "../components/CompletedQuests";
+import { LeaderBoard } from "../components/LeaderBoard";
 
 
 type QuestType = "create-quest" | "join-quest" | undefined;
@@ -72,6 +73,7 @@ const Home: NextPage = () => {
       <CallToAction />
     </Container>
     <CompletedQuests />
+    <LeaderBoard /> 
     <TribeMembers />
     </Box>
   );
