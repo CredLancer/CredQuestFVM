@@ -14,9 +14,11 @@ import {
 import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { NavDrawerItem, NavItem } from "./NavItem";
+import { useAccount } from "wagmi";
 
 export const Header = () => {
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
+  const { isConnected } = useAccount();
 
   const navItems = [
     {
@@ -29,11 +31,13 @@ export const Header = () => {
     },
     {
       text: "Organization",
-      href: "/organization",
+      href: "/dashboard?user=org",
+      disabled: !isConnected,
     },
     {
       text: "Freelancer",
-      href: "/freelancer",
+      href: "/dashboard?user-lancer",
+      disabled: !isConnected,
     },
   ];
 
@@ -61,7 +65,10 @@ export const Header = () => {
               mr={4}
             >
               {navItems.map((navItem, index) => (
-                <NavItem key={index} href={navItem.href}>
+                <NavItem
+                  key={index}
+                  href={navItem.disabled ? "" : navItem.href}
+                >
                   <Text className="capitalize">{navItem.text}</Text>
                 </NavItem>
               ))}

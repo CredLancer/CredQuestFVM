@@ -13,7 +13,6 @@ import { TribeMembers } from "../components/TribeMembers";
 import { CompletedQuests } from "../components/CompletedQuests";
 import { LeaderBoard } from "../components/LeaderBoard";
 
-
 type QuestType = "create-quest" | "join-quest" | undefined;
 
 const CallToAction = () => {
@@ -44,8 +43,8 @@ const CallToAction = () => {
 
       <Flex alignItems="center" justifyContent="center" gap="8" marginTop="10">
         <Button
-          onClick={() => handleCreateQuest()}
-          disabled={disabled}
+          onClick={() => !disabled && handleCreateQuest()}
+          // disabled={disabled}
           colorScheme="blue"
           type="button"
         >
@@ -55,7 +54,7 @@ const CallToAction = () => {
         <Button
           colorScheme="blue"
           disabled={disabled}
-          onClick={handleJoinQuest}
+          onClick={() => !disabled && handleJoinQuest()}
           type="button"
           variant="outline"
         >
@@ -68,13 +67,13 @@ const CallToAction = () => {
 
 const Home: NextPage = () => {
   return (
-    <Box bgGradient='linear(#71DCCC 0%, #71DCCC 25%, #29116c 50%, )'>
-    <Container>
-      <CallToAction />
-    </Container>
-    <CompletedQuests />
-    <LeaderBoard /> 
-    <TribeMembers />
+    <Box bgGradient="linear(#71DCCC 0%, #71DCCC 25%, #29116c 50%, )">
+      <Container>
+        <CallToAction />
+      </Container>
+      <CompletedQuests />
+      <LeaderBoard />
+      <TribeMembers />
     </Box>
   );
 };

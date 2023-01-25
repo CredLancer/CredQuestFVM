@@ -12,6 +12,15 @@ interface Props {
 const theme = extendTheme({
   colors: {
     backgroundDark: "#1F1B24",
+    black: {
+      1: "#FFFFFF",
+      2: "#0A0017",
+      5: "#898989",
+    },
+    white: {
+      1: "#FFFFFF",
+      2: "#E8EDF6",
+    },
     purple: {
       1: "#9C1EF3",
     },
