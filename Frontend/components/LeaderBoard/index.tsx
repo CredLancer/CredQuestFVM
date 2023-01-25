@@ -28,6 +28,7 @@ import {
         >
 
         <Box
+          mx="30px"
           bg="bg-surface"
           boxShadow={{ base: 'none', md: useColorModeValue('sm', 'sm-dark') }}
           borderRadius={useBreakpointValue({ base: 'none', md: 'lg' })}
