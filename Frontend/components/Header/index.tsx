@@ -36,7 +36,7 @@ export const Header = () => {
     },
     {
       text: "Freelancer",
-      href: "/dashboard?user-lancer",
+      href: "/lancerDashboard?user=lancer",
       disabled: !isConnected,
     },
   ];
