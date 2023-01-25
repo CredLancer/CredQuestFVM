@@ -19,12 +19,27 @@ import { useAccount, useSendTransaction } from "wagmi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { useState } from "react";
 import { SelectRoleModal } from "../components/Modals/SelectRole";
+import { useRouter } from "next/router";
 
 const Dashboard: NextPage = () => {
+  const { isConnected } = useAccount();
+  const router = useRouter();
+
+  if (!isConnected) {
+    router.push("");
+    return null;
+  }
+
   return (
-    <Box bgGradient='linear(#9C1EF3 0%, #9C1EF3 25%, #29116c 75%, )' minH="3xl">
+    <Box bgGradient="linear(#9C1EF3 0%, #9C1EF3 25%, #29116c 75%, )" minH="3xl">
       <Container maxW="6xl" paddingY="2em">
-        <Box maxW="100%" marginX="auto" mt="12" border="1px solid white" bg="black" >
+        <Box
+          maxW="100%"
+          marginX="auto"
+          mt="12"
+          border="1px solid white"
+          bg="black"
+        >
           <Flex
             backgroundColor="white"
             alignItems="flex-end"
@@ -68,14 +83,21 @@ const Dashboard: NextPage = () => {
                 <GridItem>
                   <Box>
                     <Heading>Industry</Heading>
-                    <Text>Creating In-game graphics, audio engineering, VR</Text>
+                    <Text>
+                      Creating In-game graphics, audio engineering, VR
+                    </Text>
                   </Box>
                 </GridItem>
               </Grid>
             </GridItem>
 
             <GridItem alignSelf="center" justifySelf="center">
-              <Button colorScheme="blue">Create Quest</Button>
+              <Button
+                onClick={() => router.push("create-quest")}
+                colorScheme="blue"
+              >
+                Create Quest
+              </Button>
             </GridItem>
           </Grid>
 
