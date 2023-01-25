@@ -51,8 +51,8 @@ import {
   ]
   
   export const Footer = () => (
-    <Box bg="#29116c">
-      <Container as="footer" role="contentinfo">
+    <Box mx="auto">
+      <Box px="50px" maxWidth="7xl">
         <Stack
           justify="space-between"
           align="start"
@@ -91,6 +91,6 @@ import {
           align="center"
         >
         </Stack>
-      </Container>
+      </Box>
     </Box>
   )
