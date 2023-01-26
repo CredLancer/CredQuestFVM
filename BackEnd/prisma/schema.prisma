@@ -11,13 +11,15 @@ datasource db {
 }
 
 model Organization {
-  id          String  @id
-  admin       String
-  name        String
-  imageCID    String
-  imageURL    String?
-  description String?
-  video       String?
+  id                       String                     @id
+  admin                    String
+  name                     String
+  imageCID                 String
+  imageURL                 String?
+  description              String?
+  video                    String?
+  blockNumber              Int?
+  OrganizationDetailUpdate OrganizationDetailUpdate[]
 }
 
 enum OrganizationDetailUpdateType {
@@ -34,6 +36,8 @@ model OrganizationDetailUpdate {
   type             OrganizationDetailUpdateType
   from             String
   to               String
+  orgId            String
+  org              Organization                 @relation(fields: [orgId], references: [id])
 
   @@id([transactionHash, blockNumber, transactionIndex, logIndex])
 }
