@@ -104,6 +104,8 @@ contract OrganizationController is Ownable, Pausable {
         if (organizationIds[newAdmin] != 0)
             revert OrganizationsPerAddressLimitReached();
         organizations[orgId].admin = newAdmin;
+        organizationIds[msg.sender] = 0;
+        organizationIds[newAdmin] = orgId;
         emit AdminChanged(orgId, msg.sender, newAdmin);
     }
 
