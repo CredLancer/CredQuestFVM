@@ -10,6 +10,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum SignatureType {
+  OrganizationCreation
+  QuestCreation
+  ProposalCreation
+  WorkSubmission
+}
+
+model signature {
+  nonce     BigInt        @id
+  user      String
+  hash      String
+  signature String
+  type      SignatureType
+}
+
 model Organization {
   id                       String                     @id
   admin                    String
