@@ -7,8 +7,11 @@ import { BigNumber } from "@ethersproject/bignumber";
 import { useState } from "react";
 import { SelectRoleModal } from "../components/Modals/SelectRole";
 
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
+import { TribeMembers } from "../components/TribeMembers";
+import { CompletedQuests } from "../components/CompletedQuests";
+import { LeaderBoard } from "../components/LeaderBoard";
 
 type QuestType = "create-quest" | "join-quest" | undefined;
 
@@ -22,25 +25,26 @@ const CallToAction = () => {
     setOpen("join-quest");
   };
 
+  const disabled = !isConnected || !address;
+  console.log({ disabled });
+
   if (openModal) {
     return <SelectRoleModal handleClose={() => setOpen(undefined)} />;
   }
 
   return (
-    <Box padding="12">
-      <Heading fontFamily="Alvotica" color="purple.1">
-        Join a Quest Find your Soul Bound Tribe
+    <Box padding="12" minH="md" mt="200px">
+      <Heading fontFamily="Alvotica" textAlign="center" color="#9C1EF3">
+        Join a Quest
+      </Heading>
+      <Heading fontFamily="Alvotica" textAlign="center" color="#9C1EF3">
+        Find your Soul Bound Tribe
       </Heading>
 
       <Flex alignItems="center" justifyContent="center" gap="8" marginTop="10">
-        <ConnectButton />
-      </Flex>
-
-
-      <Flex alignItems="center" justifyContent="center" gap="8" marginTop="10">
         <Button
-          onClick={() => handleCreateQuest()}
-          disabled={!isConnected || !address}
+          onClick={() => !disabled && handleCreateQuest()}
+          // disabled={disabled}
           colorScheme="blue"
           type="button"
         >
@@ -49,8 +53,8 @@ const CallToAction = () => {
 
         <Button
           colorScheme="blue"
-          disabled={!isConnected || !address}
-          onClick={handleJoinQuest}
+          disabled={disabled}
+          onClick={() => !disabled && handleJoinQuest()}
           type="button"
           variant="outline"
         >
@@ -63,9 +67,14 @@ const CallToAction = () => {
 
 const Home: NextPage = () => {
   return (
-    <Container>
-      <CallToAction />
-    </Container>
+    <Box bgGradient="linear(#71DCCC 0%, #71DCCC 25%, #29116c 50%, )">
+      <Container>
+        <CallToAction />
+      </Container>
+      <CompletedQuests />
+      <LeaderBoard />
+      <TribeMembers />
+    </Box>
   );
 };
 
