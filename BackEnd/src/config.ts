@@ -1,4 +1,6 @@
 import dotenv from "dotenv";
+import { ethers } from "ethers";
+
 dotenv.config();
 
 export const PORT = parseInt(process.env.PORT || "8000");
@@ -9,3 +11,14 @@ export const QUEST_CONTROLLER_ADDRESS =
 export const WEB3_RPC_URI = process.env.WEB3_RPC_URI || "";
 export const SIGNER_PRIVATE_KEY = process.env.SIGNER_PRIVATE_KEY || "";
 export const LIGHTHOUSE_API_KEY = process.env.LIGHTHOUSE_API_KEY || "";
+
+export const provider = new ethers.providers.JsonRpcProvider(WEB3_RPC_URI);
+
+export async function getOrganizationContractDomain() {
+  return {
+    name: "Organization Controller",
+    version: "1",
+    chainId: (await provider.getNetwork()).chainId,
+    verifyingContract: ORGANIZATION_CONTROLLER_ADDRESS,
+  };
+}

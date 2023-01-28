@@ -4,8 +4,8 @@ import ORGANIZATION_CONTROLLER_ABI from "../abi/OrganizationController.json";
 import QUEST_CONTROLLER_ABI from "../abi/QuestController.json";
 import {
   ORGANIZATION_CONTROLLER_ADDRESS,
+  provider,
   QUEST_CONTROLLER_ADDRESS,
-  WEB3_RPC_URI,
 } from "../config";
 import { OrganizationController, QuestController } from "../typechain-types";
 import organizationAdminChangeHandler from "./eventHandlers/organizationAdminChangeHandler";
@@ -15,8 +15,6 @@ import organizationNameChangeHandler from "./eventHandlers/organizationNameChang
 import proposalCreatedHandler from "./eventHandlers/proposalCreatedHandler";
 import proposalStatusUpdateHandler from "./eventHandlers/proposalStatusUpdateHandler";
 import questCreatedHandler from "./eventHandlers/questCreatedHandler";
-
-const provider = new ethers.providers.JsonRpcProvider(WEB3_RPC_URI);
 
 const organizationController = new ethers.Contract(
   ORGANIZATION_CONTROLLER_ADDRESS,

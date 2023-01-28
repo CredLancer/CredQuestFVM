@@ -13,8 +13,8 @@ export async function getNonce() {
   const lastSignature = await prisma.signature.findFirst({
     orderBy: { nonce: "desc" },
   });
-  const nonce = lastSignature ? Number(lastSignature.nonce) + 1 : 1;
-  return nonce;
+  const nonce = lastSignature ? lastSignature.nonce + BigInt(1) : BigInt(1);
+  return nonce.toString();
 }
 
 export async function signMessage(hash: any) {

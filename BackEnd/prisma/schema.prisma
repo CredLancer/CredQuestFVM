@@ -20,7 +20,6 @@ enum SignatureType {
 model signature {
   nonce     BigInt        @id
   user      String
-  hash      String
   signature String
   type      SignatureType
 }

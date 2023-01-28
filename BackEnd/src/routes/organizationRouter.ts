@@ -1,4 +1,5 @@
 import { PrismaClient, SignatureType } from "@prisma/client";
+import CID from "cids";
 import { ethers } from "ethers";
 import { Router } from "express";
 import { body } from "express-validator";
@@ -8,6 +9,7 @@ import {
   signMessage,
   uploadToIPFS,
 } from "../helpers";
+import { signForOrganizationCreation } from "../signatures";
 
 const prisma = new PrismaClient();
 
@@ -32,25 +34,26 @@ organizationRouter.post(
         .status(400)
         .json({ message: "one admin can create only one organization" });
     const response = await uploadToIPFS(image.buffer);
-    const imageCID = response.Hash;
+    const imageCID = `0x${new CID(response.Hash)
+      .toV1()
+      .toString("base16")
+      .substring(1)}`;
     const nonce = await getNonce();
-    const data = ethers.utils.solidityPack(
-      ["address", "string", "string", "uint256"],
-      [admin, name, imageCID, nonce]
-    );
-    const hash = ethers.utils.hashMessage(data);
-    console.log(hash);
-    const signature = await signMessage(hash);
+    const signature = await signForOrganizationCreation({
+      admin,
+      name,
+      imageCID,
+      nonce,
+    });
     await prisma.signature.create({
       data: {
-        nonce,
+        nonce: Number(nonce),
         signature,
-        hash,
         user: admin,
         type: SignatureType.OrganizationCreation,
       },
     });
-    res.json({ nonce, signature });
+    res.json({ nonce, signature, imageCID });
   }
 );
 
