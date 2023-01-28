@@ -92,12 +92,21 @@ const Dashboard: NextPage = () => {
             </GridItem>
 
             <GridItem alignSelf="center" justifySelf="center">
-              <Button
-                onClick={() => router.push("create-quest")}
-                colorScheme="blue"
-              >
-                Create Quest
-              </Button>
+              <VStack>
+                <Button
+                  onClick={() => router.push("create-quest")}
+                  colorScheme="blue"
+                >
+                  Create Quest
+                </Button>
+                <Button
+                  onClick={() => router.push("quests")}
+                  colorScheme="blue"
+                  variant="outline"
+                >
+                  View Quests
+                </Button>
+              </VStack>
             </GridItem>
           </Grid>
 

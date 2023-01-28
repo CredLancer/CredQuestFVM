@@ -28,8 +28,8 @@ import { QuestDisplayPage } from "../components/Page/QuestDisplay";
 import { useForm } from "react-hook-form";
 import { CheckCircleIcon } from "@chakra-ui/icons";
 
-const Dashboard: NextPage = () => {
-  const { handleSubmit } = useForm();
+const CreateQuest: NextPage = () => {
+  const { handleSubmit, register } = useForm();
   const { isConnected } = useAccount();
   const router = useRouter();
   const isFirstTime = false;
@@ -85,8 +85,8 @@ const Dashboard: NextPage = () => {
                       bg="white.2"
                       borderRadius="2px"
                       id="title"
+                      {...register("title")}
                       type="text"
-                      name="title"
                       color="black.5"
                     />
                   </FormControl>
@@ -100,9 +100,9 @@ const Dashboard: NextPage = () => {
                       bg="white.2"
                       borderRadius="2px"
                       id="hoursRequired"
+                      {...register("hoursRequired")}
                       type="number"
                       color="black.5"
-                      name="hoursRequired"
                     />
                   </FormControl>
                 </GridItem>
@@ -115,7 +115,7 @@ const Dashboard: NextPage = () => {
                       id="deadline"
                       type="datetime-local"
                       color="black.5"
-                      name="deadline"
+                      {...register("deadline")}
                     />
                   </FormControl>
                 </GridItem>
@@ -130,7 +130,7 @@ const Dashboard: NextPage = () => {
                       borderRadius="2px"
                       id="credentials"
                       color="black.5"
-                      name="credentials"
+                      {...register("credentials")}
                     />
                   </FormControl>
                 </GridItem>
@@ -143,7 +143,7 @@ const Dashboard: NextPage = () => {
                       id="skills"
                       type="number"
                       color="black.5"
-                      name="skills"
+                      {...register("skills")}
                     />
                   </FormControl>
                 </GridItem>
@@ -173,7 +173,7 @@ const Dashboard: NextPage = () => {
                       id="reward"
                       type="number"
                       color="black.5"
-                      name="reward"
+                      {...register("reward")}
                     />
                   </FormControl>
                 </GridItem>
@@ -188,7 +188,7 @@ const Dashboard: NextPage = () => {
                       height="200px"
                       id="description"
                       color="black.5"
-                      name="description"
+                      {...register("description")}
                     />
                   </FormControl>
                 </GridItem>
@@ -206,4 +206,4 @@ const Dashboard: NextPage = () => {
   );
 };
 
-export default Dashboard;
+export default CreateQuest;
