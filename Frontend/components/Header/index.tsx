@@ -11,21 +11,14 @@ import {
   Button,
   Link,
 } from "@chakra-ui/react";
-import Davatar from "@davatar/react";
-import {
-  InformationCircleIcon,
-  LoginIcon,
-  MenuIcon,
-  XIcon,
-} from "@heroicons/react/outline";
+import { HamburgerIcon, CloseIcon } from "@chakra-ui/icons";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { NavDrawerItem, NavItem } from "./NavItem";
-
-// @ts-ignore
-import { SocialIcon } from "react-social-icons";
+import { useAccount } from "wagmi";
 
 export const Header = () => {
   const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
+  const { isConnected } = useAccount();
 
   const navItems = [
     {
@@ -38,16 +31,18 @@ export const Header = () => {
     },
     {
       text: "Organization",
-      href: "/organization",
+      href: "/dashboard?user=org",
+      disabled: !isConnected,
     },
     {
       text: "Freelancer",
-      href: "/freelancer",
+      href: "/dashboard?user-lancer",
+      disabled: !isConnected,
     },
   ];
 
   return (
-    <header>
+    <Box bg="black">
       <Stack direction={["column", "column", "row"]} px={2} py={4}>
         <HStack
           justifyContent={["space-between"]}
@@ -70,7 +65,10 @@ export const Header = () => {
               mr={4}
             >
               {navItems.map((navItem, index) => (
-                <NavItem key={index} href={navItem.href}>
+                <NavItem
+                  key={index}
+                  href={navItem.disabled ? "" : navItem.href}
+                >
                   <Text className="capitalize">{navItem.text}</Text>
                 </NavItem>
               ))}
@@ -91,9 +89,9 @@ export const Header = () => {
               onClick={onOpen}
             >
               {isOpen ? (
-                <XIcon className="w-5 h-5" />
+                <CloseIcon className="w-5 h-5" />
               ) : (
-                <MenuIcon className="w-5 h-5" />
+                <HamburgerIcon className="w-5 h-5" />
               )}
             </Button>
           </HStack>
@@ -141,7 +139,7 @@ export const Header = () => {
                   borderRadius="100%"
                   onClick={onToggle}
                 >
-                  <XIcon className="w-7 h-7" />
+                  <CloseIcon className="w-7 h-7" />
                 </Button>
               </Flex>
             </Box>
@@ -156,26 +154,9 @@ export const Header = () => {
                 </Flex>
               </NavDrawerItem>
             ))}
-            {/* Twitter Wrapper */}
-            <Flex
-              width="100%"
-              justify="space-between"
-              bottom="2rem"
-              alignItems="center"
-              left="0"
-              paddingX="1.5rem"
-              position="absolute"
-            >
-              {/* Twitter Link - URL SHOULD BE UPDATED */}
-              <SocialIcon
-                bgColor="white"
-                url="https://twitter.com/ilyxium"
-                target="_blank"
-              />
-            </Flex>
           </DrawerBody>
         </DrawerContent>
       </Drawer>
-    </header>
+    </Box>
   );
 };
