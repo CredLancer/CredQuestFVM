@@ -12,6 +12,9 @@ import organizationAdminChangeHandler from "./eventHandlers/organizationAdminCha
 import organizationCreatedHandler from "./eventHandlers/organizationCreatedHandler";
 import organizationImageCIDChangeHandler from "./eventHandlers/organizationImageCIDChangeHandler";
 import organizationNameChangeHandler from "./eventHandlers/organizationNameChangeHandler";
+import proposalCreatedHandler from "./eventHandlers/proposalCreatedHandler";
+import proposalStatusUpdateHandler from "./eventHandlers/proposalStatusUpdateHandler";
+import questCreatedHandler from "./eventHandlers/questCreatedHandler";
 
 const provider = new ethers.providers.JsonRpcProvider(WEB3_RPC_URI);
 
@@ -44,6 +47,11 @@ async function main(currBlockNumber: number) {
     organizationController.filters.OrganizationNameChanged();
   const organizationImageCIDChangedFilter =
     organizationController.filters.OrganizationImageCIDChanged();
+  const questCreatedFilter = questController.filters.QuestCreated();
+  const proposalCreatedFilter = questController.filters.ProposalCreated();
+  const proposalStatusChangedFilter =
+    questController.filters.ProposalStatusChanged();
+  const workSubmittedFilter = questController.filters.WorkSubmitted();
 
   {
     const lastCreatedOrganization = await prisma.organization.findFirst({
@@ -116,6 +124,58 @@ async function main(currBlockNumber: number) {
 
     for (const eventEmitted of eventsEmitted) {
       await organizationImageCIDChangeHandler(eventEmitted);
+    }
+  }
+
+  {
+    const lastQuestCreated = await prisma.quest.findFirst({
+      orderBy: { blockNumber: "desc" },
+    });
+    const lastBlock = lastQuestCreated
+      ? lastQuestCreated.blockNumber
+      : LOWEST_BLOCK;
+    const eventsEmitted = await questController.queryFilter(
+      questCreatedFilter,
+      lastBlock
+    );
+
+    for (const eventEmitted of eventsEmitted) {
+      await questCreatedHandler(eventEmitted);
+    }
+  }
+
+  {
+    const lastProposalCreated = await prisma.proposal.findFirst({
+      orderBy: { blockNumber: "desc" },
+    });
+    const lastBlock = lastProposalCreated
+      ? lastProposalCreated.blockNumber
+      : LOWEST_BLOCK;
+    const eventsEmitted = await questController.queryFilter(
+      proposalCreatedFilter,
+      lastBlock
+    );
+
+    for (const eventEmitted of eventsEmitted) {
+      await proposalCreatedHandler(eventEmitted);
+    }
+  }
+
+  {
+    const lastProposalStatusChange =
+      await prisma.proposalStatusChange.findFirst({
+        orderBy: { blockNumber: "desc" },
+      });
+    const lastBlock = lastProposalStatusChange
+      ? lastProposalStatusChange.blockNumber
+      : LOWEST_BLOCK;
+    const eventsEmitted = await questController.queryFilter(
+      proposalStatusChangedFilter,
+      lastBlock
+    );
+
+    for (const eventEmitted of eventsEmitted) {
+      await proposalStatusUpdateHandler(eventEmitted);
     }
   }
 }
