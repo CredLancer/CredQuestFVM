@@ -1,15 +1,41 @@
 import { OrganizationController } from "../typechain-types";
 import { ethers } from "hardhat";
-import { Signer } from "ethers";
+import { ethers as e, Signer } from "ethers";
 import { expect } from "chai";
 import { ZERO_ADDRESS } from "./helpers";
 
 describe("Organization Controller Contract", function () {
+  const domain = {
+    name: "Organization Controller",
+    version: "1",
+    chainId: 1,
+    verifyingContract: "",
+  };
+
+  const typesForCreateOrganization = {
+    CreateOrganization: [
+      { name: "admin", type: "address" },
+      { name: "name", type: "string" },
+      { name: "imageCID", type: "bytes" },
+      { name: "nonce", type: "uint256" },
+    ],
+  };
+  const typesForUpdateImageCID = {
+    UpdateImageCID: [
+      { name: "orgId", type: "uint256" },
+      { name: "imageCID", type: "bytes" },
+      { name: "nonce", type: "uint256" },
+    ],
+  };
+
   let signers: Signer[];
   const accounts: string[] = [];
+  let wallet: e.Wallet;
   let organizationController: OrganizationController;
+  let lastNonce = 0;
 
   this.beforeAll(async function () {
+    wallet = e.Wallet.createRandom();
     // get signers
     signers = await ethers.getSigners();
     for (const signer of signers) accounts.push(await signer.getAddress());
@@ -20,22 +46,55 @@ describe("Organization Controller Contract", function () {
     );
     organizationController = await OrganizationController.deploy();
     await organizationController.deployed();
+    domain.verifyingContract = organizationController.address;
+    domain.chainId = ethers.provider.network.chainId;
+    await organizationController.setSigner(wallet.address);
   });
 
   describe("Organization Creation", function () {
     it("Should create a organization", async function () {
+      const nonce = ++lastNonce;
+      const signature = await wallet._signTypedData(
+        domain,
+        typesForCreateOrganization,
+        {
+          admin: accounts[0],
+          name: "Org 1",
+          imageCID:
+            "0x01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a",
+          nonce,
+        }
+      );
+
       await organizationController.createOrganization(
         "Org 1",
-        "0x01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a"
+        "0x01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a",
+        signature,
+        nonce
       );
       expect(await organizationController.adminOf(1)).to.be.equal(accounts[0]);
     });
 
     it("Should not create a organization again for the same admin", async function () {
+      const nonce = ++lastNonce;
+      const signature = await wallet._signTypedData(
+        domain,
+        typesForCreateOrganization,
+        {
+          admin: accounts[0],
+          name: "Org 2",
+          imageCID:
+            "0x01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a",
+          nonce,
+        }
+      );
+
       await expect(
         organizationController.createOrganization(
           "Org 2",
-          "0x01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a"
+          "0x01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a",
+          signature,
+          nonce
         )
       ).to.be.revertedWithCustomError(
         organizationController,
@@ -44,11 +103,26 @@ describe("Organization Controller Contract", function () {
     });
 
     it("Should create organization for another user", async function () {
+      const nonce = ++lastNonce;
+      const signature = await wallet._signTypedData(
+        domain,
+        typesForCreateOrganization,
+        {
+          admin: accounts[1],
+          name: "Org 2",
+          imageCID:
+            "0x01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a",
+          nonce,
+        }
+      );
+
       await organizationController
         .connect(signers[1])
         .createOrganization(
           "Org 2",
-          "0x01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a"
+          "0x01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a",
+          signature,
+          nonce
         );
       expect(await organizationController.adminOf(2)).to.be.equal(accounts[1]);
     });
@@ -129,20 +203,48 @@ describe("Organization Controller Contract", function () {
     });
 
     it("Should not update image cid if not the admin", async function () {
+      const nonce = ++lastNonce;
+      const signature = await wallet._signTypedData(
+        domain,
+        typesForUpdateImageCID,
+        {
+          orgId: 1,
+          imageCID:
+            "0x0f01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a",
+          nonce,
+        }
+      );
+
       await expect(
         organizationController.updateImageCID(
           "1",
-          "0x0f01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a"
+          "0x0f01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a",
+          signature,
+          nonce
         )
       ).to.be.revertedWithCustomError(organizationController, "Unauthorized");
     });
 
     it("Should update image cid", async function () {
+      const nonce = ++lastNonce;
+      const signature = await wallet._signTypedData(
+        domain,
+        typesForUpdateImageCID,
+        {
+          orgId: 1,
+          imageCID:
+            "0x0f01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a",
+          nonce,
+        }
+      );
+
       await organizationController
         .connect(signers[2])
         .updateImageCID(
           "1",
-          "0x0f01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a"
+          "0x0f01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a",
+          signature,
+          nonce
         );
       expect(
         (await organizationController.organizations("1")).imageCID
@@ -168,12 +270,27 @@ describe("Organization Controller Contract", function () {
 
   describe("Methods should not be callable if contract is paused", function () {
     it("Should not call the create organization method", async function () {
+      const nonce = ++lastNonce;
+      const signature = await wallet._signTypedData(
+        domain,
+        typesForCreateOrganization,
+        {
+          admin: accounts[3],
+          name: "Org 4",
+          imageCID:
+            "0x01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a",
+          nonce,
+        }
+      );
+
       await expect(
         organizationController
           .connect(signers[3])
           .createOrganization(
             "Org 4",
-            "0x01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a"
+            "0x01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a",
+            signature,
+            nonce
           )
       ).to.be.revertedWith("Pausable: paused");
     });
@@ -185,12 +302,26 @@ describe("Organization Controller Contract", function () {
     });
 
     it("Should not call update image cid method", async function () {
+      const nonce = ++lastNonce;
+      const signature = await wallet._signTypedData(
+        domain,
+        typesForUpdateImageCID,
+        {
+          orgId: 1,
+          imageCID:
+            "0x0f01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a",
+          nonce,
+        }
+      );
+
       await expect(
         organizationController
           .connect(signers[2])
           .updateImageCID(
             "1",
-            "0x01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a"
+            "0x01701220c3c4733ec8affd06cf9e9ff50ffc6bcd2ec85a6170004bb709669c31de94391a",
+            signature,
+            nonce
           )
       ).to.be.revertedWith("Pausable: paused");
     });
