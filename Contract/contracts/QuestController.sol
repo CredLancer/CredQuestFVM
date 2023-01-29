@@ -80,6 +80,7 @@ contract QuestController is Ownable, Pausable {
     error QuestNotOpen();
     error ProposalNotFound();
     error ProposalNotAccepted();
+    error OrganizationAdminCannotApply();
 
     constructor(OrganizationController _organizationController) {
         organizationController = _organizationController;
@@ -117,10 +118,11 @@ contract QuestController is Ownable, Pausable {
     }
 
     function sendProposal(uint256 questId, bytes calldata proposalCID) public {
-        // TODO: The organization admin should not be able to send proposal
         if (!questExists(questId)) revert InvalidQuestId();
         if (proposalIds[questId][msg.sender] != 0) revert ProposalAlreadySent();
         if (quests[questId].status != QuestStatus.Open) revert QuestNotOpen();
+        if (organizationController.adminOf(quests[questId].orgId) == msg.sender)
+            revert OrganizationAdminCannotApply();
         // TODO: verify the signature
         // TODO: verify the cid
         uint256 proposalId = ++totalProposals;
@@ -165,9 +167,9 @@ contract QuestController is Ownable, Pausable {
         return questId <= totalQuests && questId != 0;
     }
 
-    function _changeProposalStatus(uint256 proposalId, ProposalStatus newStatus)
+                         XD           function _changeProposalStatus(uint256 proposalId, ProposalStatus newStatus)
         private
-    {
+    {SF `
         // TODO: check if quest is closed first
         if (!proposalExists(proposalId)) revert InvalidProposalId();
         Proposal memory proposal = proposals[proposalId];
@@ -185,3 +187,4 @@ contract QuestController is Ownable, Pausable {
         );
     }
 }
+      

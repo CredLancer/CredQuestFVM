@@ -31,18 +31,21 @@ export interface OrganizationControllerInterface extends utils.Interface {
   functions: {
     "adminOf(uint256)": FunctionFragment;
     "changeAdmin(uint256,address)": FunctionFragment;
-    "createOrganization(string,bytes)": FunctionFragment;
+    "createOrganization(string,bytes,bytes,uint256)": FunctionFragment;
     "exists(uint256)": FunctionFragment;
+    "nonces(uint256)": FunctionFragment;
     "organizationIds(address)": FunctionFragment;
     "organizations(uint256)": FunctionFragment;
     "owner()": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
+    "setSigner(address)": FunctionFragment;
+    "signer()": FunctionFragment;
     "totalOrganizations()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "unpause()": FunctionFragment;
-    "updateImageCID(uint256,bytes)": FunctionFragment;
+    "updateImageCID(uint256,bytes,bytes,uint256)": FunctionFragment;
     "updateName(uint256,string)": FunctionFragment;
   };
 
@@ -52,12 +55,15 @@ export interface OrganizationControllerInterface extends utils.Interface {
       | "changeAdmin"
       | "createOrganization"
       | "exists"
+      | "nonces"
       | "organizationIds"
       | "organizations"
       | "owner"
       | "pause"
       | "paused"
       | "renounceOwnership"
+      | "setSigner"
+      | "signer"
       | "totalOrganizations"
       | "transferOwnership"
       | "unpause"
@@ -75,10 +81,19 @@ export interface OrganizationControllerInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "createOrganization",
-    values: [PromiseOrValue<string>, PromiseOrValue<BytesLike>]
+    values: [
+      PromiseOrValue<string>,
+      PromiseOrValue<BytesLike>,
+      PromiseOrValue<BytesLike>,
+      PromiseOrValue<BigNumberish>
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "exists",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "nonces",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
@@ -97,6 +112,11 @@ export interface OrganizationControllerInterface extends utils.Interface {
     values?: undefined
   ): string;
   encodeFunctionData(
+    functionFragment: "setSigner",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(functionFragment: "signer", values?: undefined): string;
+  encodeFunctionData(
     functionFragment: "totalOrganizations",
     values?: undefined
   ): string;
@@ -107,7 +127,12 @@ export interface OrganizationControllerInterface extends utils.Interface {
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "updateImageCID",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BytesLike>]
+    values: [
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BytesLike>,
+      PromiseOrValue<BytesLike>,
+      PromiseOrValue<BigNumberish>
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "updateName",
@@ -124,6 +149,7 @@ export interface OrganizationControllerInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "exists", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "organizationIds",
     data: BytesLike
@@ -139,6 +165,8 @@ export interface OrganizationControllerInterface extends utils.Interface {
     functionFragment: "renounceOwnership",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "setSigner", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "signer", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "totalOrganizations",
     data: BytesLike
@@ -294,6 +322,8 @@ export interface OrganizationController extends BaseContract {
     createOrganization(
       name: PromiseOrValue<string>,
       imageCID: PromiseOrValue<BytesLike>,
+      signature: PromiseOrValue<BytesLike>,
+      nonce: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -301,6 +331,11 @@ export interface OrganizationController extends BaseContract {
       orgId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<[boolean]>;
+
+    nonces(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
 
     organizationIds(
       arg0: PromiseOrValue<string>,
@@ -331,6 +366,13 @@ export interface OrganizationController extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    setSigner(
+      newSigner: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    signer(overrides?: CallOverrides): Promise<[string]>;
+
     totalOrganizations(overrides?: CallOverrides): Promise<[BigNumber]>;
 
     transferOwnership(
@@ -345,6 +387,8 @@ export interface OrganizationController extends BaseContract {
     updateImageCID(
       orgId: PromiseOrValue<BigNumberish>,
       newImageCID: PromiseOrValue<BytesLike>,
+      signature: PromiseOrValue<BytesLike>,
+      nonce: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -369,6 +413,8 @@ export interface OrganizationController extends BaseContract {
   createOrganization(
     name: PromiseOrValue<string>,
     imageCID: PromiseOrValue<BytesLike>,
+    signature: PromiseOrValue<BytesLike>,
+    nonce: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -376,6 +422,11 @@ export interface OrganizationController extends BaseContract {
     orgId: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
   ): Promise<boolean>;
+
+  nonces(
+    arg0: PromiseOrValue<BigNumberish>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   organizationIds(
     arg0: PromiseOrValue<string>,
@@ -406,6 +457,11 @@ export interface OrganizationController extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  setSigner(
+    newSigner: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   totalOrganizations(overrides?: CallOverrides): Promise<BigNumber>;
 
   transferOwnership(
@@ -420,6 +476,8 @@ export interface OrganizationController extends BaseContract {
   updateImageCID(
     orgId: PromiseOrValue<BigNumberish>,
     newImageCID: PromiseOrValue<BytesLike>,
+    signature: PromiseOrValue<BytesLike>,
+    nonce: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -444,6 +502,8 @@ export interface OrganizationController extends BaseContract {
     createOrganization(
       name: PromiseOrValue<string>,
       imageCID: PromiseOrValue<BytesLike>,
+      signature: PromiseOrValue<BytesLike>,
+      nonce: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -451,6 +511,11 @@ export interface OrganizationController extends BaseContract {
       orgId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<boolean>;
+
+    nonces(
+      arg0: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     organizationIds(
       arg0: PromiseOrValue<string>,
@@ -477,6 +542,13 @@ export interface OrganizationController extends BaseContract {
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
+    setSigner(
+      newSigner: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    signer(overrides?: CallOverrides): Promise<string>;
+
     totalOrganizations(overrides?: CallOverrides): Promise<BigNumber>;
 
     transferOwnership(
@@ -489,6 +561,8 @@ export interface OrganizationController extends BaseContract {
     updateImageCID(
       orgId: PromiseOrValue<BigNumberish>,
       newImageCID: PromiseOrValue<BytesLike>,
+      signature: PromiseOrValue<BytesLike>,
+      nonce: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -577,11 +651,18 @@ export interface OrganizationController extends BaseContract {
     createOrganization(
       name: PromiseOrValue<string>,
       imageCID: PromiseOrValue<BytesLike>,
+      signature: PromiseOrValue<BytesLike>,
+      nonce: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     exists(
       orgId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    nonces(
+      arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
@@ -607,6 +688,13 @@ export interface OrganizationController extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    setSigner(
+      newSigner: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    signer(overrides?: CallOverrides): Promise<BigNumber>;
+
     totalOrganizations(overrides?: CallOverrides): Promise<BigNumber>;
 
     transferOwnership(
@@ -621,6 +709,8 @@ export interface OrganizationController extends BaseContract {
     updateImageCID(
       orgId: PromiseOrValue<BigNumberish>,
       newImageCID: PromiseOrValue<BytesLike>,
+      signature: PromiseOrValue<BytesLike>,
+      nonce: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -646,11 +736,18 @@ export interface OrganizationController extends BaseContract {
     createOrganization(
       name: PromiseOrValue<string>,
       imageCID: PromiseOrValue<BytesLike>,
+      signature: PromiseOrValue<BytesLike>,
+      nonce: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
     exists(
       orgId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    nonces(
+      arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
@@ -676,6 +773,13 @@ export interface OrganizationController extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
+    setSigner(
+      newSigner: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    signer(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
     totalOrganizations(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
@@ -692,6 +796,8 @@ export interface OrganizationController extends BaseContract {
     updateImageCID(
       orgId: PromiseOrValue<BigNumberish>,
       newImageCID: PromiseOrValue<BytesLike>,
+      signature: PromiseOrValue<BytesLike>,
+      nonce: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 

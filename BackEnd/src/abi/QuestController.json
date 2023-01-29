@@ -32,6 +32,11 @@
   },
   {
     "inputs": [],
+    "name": "OrganizationAdminCannotApply",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "ProposalAlreadyInSameStatus",
     "type": "error"
   },

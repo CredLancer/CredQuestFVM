@@ -7,19 +7,22 @@ import { Page } from "../components/Page";
 
 import { Web3Provider } from "../providers/Web3";
 import { ChakraProvider } from "../providers/Chakra";
+import QueryClientProvider from "../providers/Query";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const isMounted = useIsMounted();
 
   return (
     <Web3Provider>
-      <ChakraProvider>
-        {isMounted && (
-          <Page>
-            <Component {...pageProps} />
-          </Page>
-        )}
-      </ChakraProvider>
+      <QueryClientProvider>
+        <ChakraProvider>
+          {isMounted && (
+            <Page>
+              <Component {...pageProps} />
+            </Page>
+          )}
+        </ChakraProvider>
+      </QueryClientProvider>
     </Web3Provider>
   );
 }
