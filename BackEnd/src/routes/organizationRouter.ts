@@ -21,18 +21,22 @@ organizationRouter.post(
   body("admin").isEthereumAddress(),
   multerUploader.single("image"),
   async (req, res) => {
+    console.log({ body: req.body });
     const { admin, name } = req.body;
     const image = req.file;
+    console.log({ image, file: req.file });
     if (!image) return res.status(400).json({ message: "file not found" });
     if (!image.mimetype.toLowerCase().includes("image"))
       return res.status(400).json({ message: "file not a image" });
     const organization = await prisma.organization.findFirst({
       where: { admin },
     });
+    console.log("Organization exists?", organization);
     if (organization)
       return res
         .status(400)
         .json({ message: "one admin can create only one organization" });
+
     const response = await uploadToIPFS(image.buffer);
     const imageCID = `0x${new CID(response.Hash)
       .toV1()
@@ -53,7 +57,7 @@ organizationRouter.post(
         type: SignatureType.OrganizationCreation,
       },
     });
-    res.json({ nonce, signature, imageCID });
+    res.json({ nonce, signature, imageCID, name });
   }
 );
 
