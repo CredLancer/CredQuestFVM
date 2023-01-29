@@ -12,11 +12,13 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { TribeMembers } from "../components/TribeMembers";
 import { CompletedQuests } from "../components/CompletedQuests";
 import { LeaderBoard } from "../components/LeaderBoard";
+import { useRouter } from "next/router";
 
 type QuestType = "create-quest" | "join-quest" | undefined;
 
 const CallToAction = () => {
   const { isConnected, address } = useAccount();
+  const router = useRouter();
   const [openModal, setOpen] = useState<QuestType>();
   const handleCreateQuest = () => {
     setOpen("create-quest");
@@ -29,7 +31,15 @@ const CallToAction = () => {
   console.log({ disabled });
 
   if (openModal) {
-    return <SelectRoleModal handleClose={() => setOpen(undefined)} />;
+    return (
+      <SelectRoleModal
+        handleClose={() =>
+          router.push(
+            `dashboard?user${openModal === "create-quest" ? "org" : "lancer"}`
+          )
+        }
+      />
+    );
   }
 
   return (

@@ -18,27 +18,21 @@ import styles from "../styles/Home.module.css";
 import { useAccount, useSendTransaction } from "wagmi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { useState } from "react";
-import { SelectRoleModal } from "../components/Modals/SelectRole";
+import { SelectRoleModal } from "../../components/Modals/SelectRole";
 import { useRouter } from "next/router";
 
-const Dashboard: NextPage = () => {
-  const { isConnected } = useAccount();
+const UserProfile: NextPage = () => {
   const router = useRouter();
 
-  if (!isConnected) {
-    router.push("");
-    return null;
-  }
-
   return (
-    <Box bgGradient="linear(#9C1EF3 0%, #9C1EF3 25%, #29116c 75%, )" minH="3xl">
+    <Box bgGradient="linear(#71DCCC 0%, #E8EDF6 25%, #71DCCC 75%)" minH="3xl">
       <Container maxW="6xl" paddingY="2em">
         <Box
           maxW="100%"
           marginX="auto"
           mt="12"
           border="1px solid white"
-          bg="black"
+          bg="#29116C"
         >
           <Flex
             backgroundColor="white"
@@ -46,9 +40,16 @@ const Dashboard: NextPage = () => {
             justifyContent="space-between"
             padding="10px"
           >
-            <Heading color="black">BIO</Heading>
+            <Heading color="black" fontSize="large" as="h4">
+              My Profile
+            </Heading>
 
-            <Button variant="link">Edit Profile</Button>
+            <Button
+              onClick={() => router.push("/profile/update")}
+              variant="link"
+            >
+              Edit Profile
+            </Button>
           </Flex>
 
           <Grid
@@ -142,4 +143,4 @@ const Dashboard: NextPage = () => {
   );
 };
 
-export default Dashboard;
+export default UserProfile;
