@@ -57,7 +57,7 @@ organizationRouter.post(
         type: SignatureType.OrganizationCreation,
       },
     });
-    res.json({ nonce, signature, imageCID });
+    res.json({ nonce, signature, imageCID, name });
   }
 );
 

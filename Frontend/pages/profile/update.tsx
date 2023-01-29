@@ -20,9 +20,13 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
-import Head from "next/head";
-import styles from "../styles/Home.module.css";
-import { useAccount, useSendTransaction } from "wagmi";
+import ORGANIZATION_ABI from "../../assets/contracts/OrganizationController.json";
+import {
+  useAccount,
+  useContractWrite,
+  usePrepareContractWrite,
+  useSendTransaction,
+} from "wagmi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { ChangeEvent, useMemo, useState } from "react";
 import { useRouter } from "next/router";
@@ -30,6 +34,7 @@ import { useForm } from "react-hook-form";
 import { useMutation } from "react-query";
 import { OrganizationService } from "../../services/organization.service";
 import Image from "next/image";
+import { ORGANIZATION_CONTRACT } from "../../utils/constants";
 
 type LogoInfo = {
   size: number;
@@ -42,11 +47,25 @@ const UserProfile: NextPage = () => {
   const { address } = useAccount();
   const {
     mutate,
-    data,
+    data: profile_data,
     isLoading: isSubmitting,
   } = useMutation(OrganizationService.createOrganizationProfile);
-  const { handleSubmit, register, setValue, getValues } = useForm();
+  const { handleSubmit, register, setValue } = useForm();
   const [uploadedLogo, setUploadedLogo] = useState<LogoInfo>();
+
+  const { config } = usePrepareContractWrite({
+    address: ORGANIZATION_CONTRACT,
+    abi: ORGANIZATION_ABI,
+    functionName: "createOrganization",
+    args: [
+      profile_data.name ?? "name_not_found",
+      profile_data.imageCID,
+      profile_data.signature,
+      profile_data.nonce,
+    ],
+    enabled: !!profile_data && !!address,
+  });
+  useContractWrite(config);
 
   const onSubmit = (model: any) => {
     console.log({ model });
@@ -62,7 +81,7 @@ const UserProfile: NextPage = () => {
     mutate(formData);
   };
 
-  console.log({ data });
+  console.log({ profile_data });
 
   const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -82,8 +101,6 @@ const UserProfile: NextPage = () => {
       }
     }
   };
-
-  console.log({ logo: getValues("org_logo") });
 
   return (
     <Box
