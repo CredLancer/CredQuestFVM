@@ -12,6 +12,7 @@ datasource db {
 
 enum SignatureType {
   OrganizationCreation
+  OrganizationImageCIDChange
   QuestCreation
   ProposalCreation
   WorkSubmission
