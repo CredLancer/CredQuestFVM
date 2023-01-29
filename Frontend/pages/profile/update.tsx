@@ -28,6 +28,7 @@ import {
   usePrepareContractWrite,
   useSendTransaction,
   useSigner,
+  useWebSocketProvider,
 } from "wagmi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { ChangeEvent, useMemo, useState } from "react";
@@ -48,6 +49,7 @@ const UserProfile: NextPage = () => {
   const router = useRouter();
   const { address } = useAccount();
   const { data: signer } = useSigner();
+  const provider = useWebSocketProvider();
   const contract = useContract({
     address: ORGANIZATION_CONTRACT,
     abi: ORGANIZATION_ABI,
@@ -73,11 +75,14 @@ const UserProfile: NextPage = () => {
     formData.append("name", `${model.first_name} ${model.last_name}`);
     formData.append("admin", address);
     mutate(formData, {
-      onSuccess: (response) => {
+      onSuccess: async (response) => {
         console.log({ response });
         const { name, imageCID, signature, nonce } = response;
         contract?.createOrganization(name, imageCID, signature, nonce, {
-          gasLimit: 10000000,
+          maxPriorityFeePerGas: await provider?.send(
+            "eth_maxPriorityFeePerGas",
+            []
+          ),
         });
       },
     });
