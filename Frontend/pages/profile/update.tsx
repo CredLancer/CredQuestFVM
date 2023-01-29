@@ -23,9 +23,11 @@ import type { NextPage } from "next";
 import ORGANIZATION_ABI from "../../assets/contracts/OrganizationController.json";
 import {
   useAccount,
+  useContract,
   useContractWrite,
   usePrepareContractWrite,
   useSendTransaction,
+  useSigner,
 } from "wagmi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { ChangeEvent, useMemo, useState } from "react";
@@ -45,6 +47,12 @@ type LogoInfo = {
 const UserProfile: NextPage = () => {
   const router = useRouter();
   const { address } = useAccount();
+  const { data: signer } = useSigner();
+  const contract = useContract({
+    address: ORGANIZATION_CONTRACT,
+    abi: ORGANIZATION_ABI,
+    signerOrProvider: signer,
+  });
   const {
     mutate,
     data: profile_data,
@@ -52,20 +60,6 @@ const UserProfile: NextPage = () => {
   } = useMutation(OrganizationService.createOrganizationProfile);
   const { handleSubmit, register, setValue } = useForm();
   const [uploadedLogo, setUploadedLogo] = useState<LogoInfo>();
-
-  const { config } = usePrepareContractWrite({
-    address: ORGANIZATION_CONTRACT,
-    abi: ORGANIZATION_ABI,
-    functionName: "createOrganization",
-    args: [
-      profile_data.name ?? "name_not_found",
-      profile_data.imageCID,
-      profile_data.signature,
-      profile_data.nonce,
-    ],
-    enabled: !!profile_data && !!address,
-  });
-  useContractWrite(config);
 
   const onSubmit = (model: any) => {
     console.log({ model });
@@ -78,7 +72,15 @@ const UserProfile: NextPage = () => {
     formData.append("image", model.org_logo);
     formData.append("name", `${model.first_name} ${model.last_name}`);
     formData.append("admin", address);
-    mutate(formData);
+    mutate(formData, {
+      onSuccess: (response) => {
+        console.log({ response });
+        const { name, imageCID, signature, nonce } = response;
+        contract?.createOrganization(name, imageCID, signature, nonce, {
+          gasLimit: 10000000,
+        });
+      },
+    });
   };
 
   console.log({ profile_data });
