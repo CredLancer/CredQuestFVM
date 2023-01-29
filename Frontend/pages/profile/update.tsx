@@ -17,38 +17,73 @@ import {
   VisuallyHiddenInput,
   FormControl,
   Select,
+  Spinner,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
 import { useAccount, useSendTransaction } from "wagmi";
 import { BigNumber } from "@ethersproject/bignumber";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { useForm } from "react-hook-form";
 import { useMutation } from "react-query";
 import { OrganizationService } from "../../services/organization.service";
+import Image from "next/image";
+
+type LogoInfo = {
+  size: number;
+  name: string;
+  image: string;
+};
 
 const UserProfile: NextPage = () => {
   const router = useRouter();
-  const { mutate } = useMutation(OrganizationService.createOrganizationProfile);
+  const { address } = useAccount();
+  const {
+    mutate,
+    data,
+    isLoading: isSubmitting,
+  } = useMutation(OrganizationService.createOrganizationProfile);
   const { handleSubmit, register, setValue, getValues } = useForm();
+  const [uploadedLogo, setUploadedLogo] = useState<LogoInfo>();
 
   const onSubmit = (model: any) => {
     console.log({ model });
-    mutate(model, {
-      //   onSuccess: () => router.push("/profile"),
-    });
+
+    if (!address) {
+      alert("Please connect your wallet");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("image", model.org_logo);
+    formData.append("name", `${model.first_name} ${model.last_name}`);
+    formData.append("admin", address);
+    mutate(formData);
   };
 
-  console.log({ values: getValues("org_logo") });
+  console.log({ data });
 
   const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files && files.length > 0) {
-      setValue("org_logo", files[0]);
+      const logo = files[0];
+      const size = logo?.size,
+        name = logo?.name;
+
+      if (size && name) {
+        const image = URL.createObjectURL(logo);
+        setUploadedLogo({
+          size,
+          name,
+          image,
+        });
+        setValue("org_logo", logo);
+      }
     }
   };
+
+  console.log({ logo: getValues("org_logo") });
 
   return (
     <Box
@@ -82,19 +117,68 @@ const UserProfile: NextPage = () => {
             <form onSubmit={handleSubmit(onSubmit)}>
               <Grid gridTemplateColumns="1fr 1fr 1fr 1fr" gap="6">
                 <GridItem colSpan={4}>
-                  <FormLabel>
-                    <Square size="150px" border="1px dashed currentColor">
-                      <Text>Choose a logo to upload</Text>
-                      {getValues("org_logo") ? (
-                        <Text>{getValues("org_logo").name}</Text>
-                      ) : null}
-                    </Square>
-                    <VisuallyHiddenInput
-                      name="org_logo"
-                      onChange={handleFileUpload}
-                      type="file"
-                    />
-                  </FormLabel>
+                  <Flex
+                    gap="6"
+                    alignItems={`flex-end`}
+                    justifyContent="flex-start"
+                  >
+                    <FormLabel>
+                      {uploadedLogo ? (
+                        <Square
+                          overflow="hidden"
+                          alignItems="start"
+                          maxH="100%"
+                          minH="100%"
+                          maxW="100%"
+                          minW="100%"
+                        >
+                          <Image
+                            src={uploadedLogo?.image ?? ""}
+                            alt={uploadedLogo?.name}
+                            width="100%"
+                            height="100%"
+                          />
+                        </Square>
+                      ) : (
+                        <Square
+                          size="150px"
+                          p="3"
+                          textAlign={`center`}
+                          border="1px dashed currentColor"
+                        >
+                          <Text>Choose a logo to upload</Text>
+                        </Square>
+                      )}
+                      <VisuallyHiddenInput
+                        name="org_logo"
+                        onChange={handleFileUpload}
+                        type="file"
+                      />
+                    </FormLabel>
+
+                    {uploadedLogo ? (
+                      <Box>
+                        <VStack spacing="4" alignItems="flex-start">
+                          <Text color="black.5">
+                            <span
+                              style={{ fontWeight: "bolder", color: "white" }}
+                            >
+                              File Size:
+                            </span>{" "}
+                            {Math.round(uploadedLogo.size / 100)}Kb
+                          </Text>
+                          <Text color="black.5">
+                            <span
+                              style={{ fontWeight: "bolder", color: "white" }}
+                            >
+                              File Name:
+                            </span>{" "}
+                            {uploadedLogo.name}
+                          </Text>
+                        </VStack>
+                      </Box>
+                    ) : null}
+                  </Flex>
                 </GridItem>
 
                 <GridItem colSpan={2}>
@@ -141,20 +225,6 @@ const UserProfile: NextPage = () => {
 
                 <GridItem colSpan={2}>
                   <FormControl>
-                    <FormLabel htmlFor="password">Password</FormLabel>
-                    <Input
-                      bg="white.2"
-                      {...register("password")}
-                      borderRadius="2px"
-                      id="password"
-                      type="text"
-                      color="black.5"
-                    />
-                  </FormControl>
-                </GridItem>
-
-                <GridItem colSpan={4}>
-                  <FormControl>
                     <FormLabel htmlFor="country">Country</FormLabel>
                     <Select
                       placeholder="Select country..."
@@ -187,7 +257,7 @@ const UserProfile: NextPage = () => {
 
                 <GridItem colSpan={4}>
                   <Button width="100%" type="submit" colorScheme="purple">
-                    CREATE
+                    {isSubmitting ? <Spinner /> : "CREATE"}
                   </Button>
                 </GridItem>
               </Grid>
