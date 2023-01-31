@@ -8,6 +8,8 @@ import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 
 import "./Credential.sol";
 import "./OrganizationController.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
 
 contract QuestController is Ownable, Pausable, EIP712 {
     using ECDSA for bytes32;
@@ -270,10 +272,9 @@ contract QuestController is Ownable, Pausable, EIP712 {
         emit WorkSubmitted(questId, proposalId, msg.sender, workCID);
     }
 
-    function acceptWork(uint256 proposalId)
-        public
-        verifyProposalAndAdmin(proposalId)
-    {
+    function acceptWork(
+        uint256 proposalId
+    ) public verifyProposalAndAdmin(proposalId) {
         Proposal memory proposal = proposals[proposalId];
         Quest memory quest = quests[proposal.questId];
         ProposalStatus oldStatus = proposal.status;
@@ -313,17 +314,15 @@ contract QuestController is Ownable, Pausable, EIP712 {
         emit FundTransferred(msg.sender, withdrawalAddress, amount);
     }
 
-    function acceptProposal(uint256 proposalId)
-        public
-        verifyProposalAndAdmin(proposalId)
-    {
+    function acceptProposal(
+        uint256 proposalId
+    ) public verifyProposalAndAdmin(proposalId) {
         _changeProposalStatus(proposalId, ProposalStatus.Accepted);
     }
 
-    function rejectProposal(uint256 proposalId)
-        public
-        verifyProposalAndAdmin(proposalId)
-    {
+    function rejectProposal(
+        uint256 proposalId
+    ) public verifyProposalAndAdmin(proposalId) {
         _changeProposalStatus(proposalId, ProposalStatus.Rejected);
     }
 
@@ -335,9 +334,10 @@ contract QuestController is Ownable, Pausable, EIP712 {
         return questId <= totalQuests && questId != 0;
     }
 
-    function _changeProposalStatus(uint256 proposalId, ProposalStatus newStatus)
-        private
-    {
+    function _changeProposalStatus(
+        uint256 proposalId,
+        ProposalStatus newStatus
+    ) private {
         // TODO: check if quest is closed first
         Proposal memory proposal = proposals[proposalId];
         if (proposal.status == ProposalStatus.Awarded)
