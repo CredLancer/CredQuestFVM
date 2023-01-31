@@ -171,11 +171,8 @@ organizationRouter.put(
   validate,
   async (req, res) => {
     const { orgId } = req.params;
-    const image = req.file;
+    const image = req.file as Express.Multer.File;
     const { signature: userSignature, signer } = req.body;
-    if (!image) return res.status(400).json({ message: "file not found" });
-    if (!image.mimetype.toLowerCase().includes("image"))
-      return res.status(400).json({ message: "file not a image" });
     const organization = await prisma.organization.findUnique({
       where: { id: orgId },
     });
@@ -210,5 +207,19 @@ organizationRouter.put(
     res.json({ nonce, signature, imageCID });
   }
 );
+
+organizationRouter.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  const org = await prisma.organization.findUnique({ where: { id } });
+  if (!org) return res.status(404).json({ message: "Organization not found" });
+  res.json({ org });
+});
+
+organizationRouter.get("/admin/:admin", async (req, res) => {
+  const { admin } = req.params;
+  const org = await prisma.organization.findFirst({ where: { admin } });
+  if (!org) return res.status(404).json({ message: "Organization not found" });
+  res.json({ org });
+});
 
 export default organizationRouter;
