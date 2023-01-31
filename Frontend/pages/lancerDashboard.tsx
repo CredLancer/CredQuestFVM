@@ -66,7 +66,7 @@ const Dashboard: NextPage = () => {
               >
                 <GridItem>
                   <Heading as="h3" textAlign="center">
-                    Bit Dao
+                    Freelancer User
                   </Heading>
                 </GridItem>
                 <GridItem justifySelf="flex-end">
@@ -92,21 +92,12 @@ const Dashboard: NextPage = () => {
             </GridItem>
 
             <GridItem alignSelf="center" justifySelf="center">
-              <VStack>
-                <Button
-                  onClick={() => router.push("create-quest")}
-                  colorScheme="blue"
-                >
-                  Create Quest
-                </Button>
-                <Button
-                  onClick={() => router.push("quests")}
-                  colorScheme="blue"
-                  variant="outline"
-                >
-                  View Quests
-                </Button>
-              </VStack>
+              <Button
+                onClick={() => router.push("create-quest")}
+                colorScheme="blue"
+              >
+                Create Quest
+              </Button>
             </GridItem>
           </Grid>
 

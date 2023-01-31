@@ -16,14 +16,19 @@ import { capitalize } from "lodash";
 import Image from "next/image";
 import React from "react";
 import * as LancerKnight from "../../assets/pngs/knight-logo.png";
+import { useRouter } from "next/router";
 
 interface RoleData {
   name: string;
   id: string;
   logo?: string;
+  href: string;
 }
 
-const DisplayRoleBox: React.FC<RoleData> = ({ name, logo }) => {
+const DisplayRoleBox: React.FC<RoleData> = ({ name, href, logo }) => {
+
+  const router = useRouter();
+
   return (
     <Box
       border="5px solid white"
@@ -32,7 +37,7 @@ const DisplayRoleBox: React.FC<RoleData> = ({ name, logo }) => {
       bg="#29116C"
       textAlign="center"
     >
-      <Box width="100%">
+      <Box width="100%" onClick={() => router.push(href)}>
         <Image src={logo ?? LancerKnight} alt={name} />
       </Box>
       <Text>{capitalize(name)}</Text>
@@ -41,8 +46,14 @@ const DisplayRoleBox: React.FC<RoleData> = ({ name, logo }) => {
 };
 
 const roles: RoleData[] = [
-  { id: "org", name: "organization" },
-  { id: "hunter", name: "credlancer" },
+  { id: "org", 
+  name: "organization" ,
+  href: "/dashboard?user=org"
+  },
+  { id: "hunter", 
+  name: "credlancer" ,
+  href: "/lancerDashboard?user=lancer"
+  },
 ];
 
 interface ModalProp {

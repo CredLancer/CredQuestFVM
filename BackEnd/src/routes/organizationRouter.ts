@@ -20,15 +20,18 @@ organizationRouter.post(
   body("admin").isEthereumAddress(),
   validate,
   async (req, res) => {
+    console.log({ body: req.body });
     const { admin, name } = req.body;
     const image = req.file as Express.Multer.File;
     const organization = await prisma.organization.findFirst({
       where: { admin },
     });
+    console.log("Organization exists?", organization);
     if (organization)
       return res
         .status(400)
         .json({ message: "one admin can create only one organization" });
+
     const response = await uploadToIPFS(image.buffer);
     const imageCID = `0x${new CID(response.Hash)
       .toV1()
@@ -49,7 +52,7 @@ organizationRouter.post(
         type: SignatureType.OrganizationCreation,
       },
     });
-    res.json({ nonce, signature, imageCID });
+    res.json({ nonce, signature, imageCID, name });
   }
 );
 
