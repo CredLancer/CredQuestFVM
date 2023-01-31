@@ -18,11 +18,20 @@ import styles from "../styles/Home.module.css";
 import { useAccount, useSendTransaction } from "wagmi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { useState } from "react";
+import { useQuery } from "react-query";
 import { SelectRoleModal } from "../../components/Modals/SelectRole";
 import { useRouter } from "next/router";
+import { OrganizationService } from "../../services/organization.service";
 
 const UserProfile: NextPage = () => {
   const router = useRouter();
+  const { address } = useAccount();
+  const { data, isLoading, isError, error } = useQuery(
+    ["organization.address", address],
+    () => OrganizationService.findOrganizationByAddress(`${address}`)
+  );
+
+  console.log({ data });
 
   return (
     <Box bgGradient="linear(#71DCCC 0%, #E8EDF6 25%, #71DCCC 75%)" minH="3xl">
