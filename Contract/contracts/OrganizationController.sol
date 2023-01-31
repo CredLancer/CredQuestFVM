@@ -160,6 +160,8 @@ contract OrganizationController is Ownable, Pausable, EIP712 {
         if (newAdmin == address(0)) revert ZeroAddressCannotBeAdmin();
         if (organizationIds[newAdmin] != 0)
             revert OrganizationsPerAddressLimitReached();
+        organizationIds[msg.sender] = 0;
+        organizationIds[newAdmin] = orgId;
         organizations[orgId].admin = newAdmin;
         emit AdminChanged(orgId, msg.sender, newAdmin);
     }
