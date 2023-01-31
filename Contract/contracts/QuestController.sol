@@ -232,9 +232,9 @@ contract QuestController is Ownable, Pausable, EIP712 {
         return questId <= totalQuests && questId != 0;
     }
 
-                         XD           function _changeProposalStatus(uint256 proposalId, ProposalStatus newStatus)
+    function _changeProposalStatus(uint256 proposalId, ProposalStatus newStatus)
         private
-    {SF `
+    {
         // TODO: check if quest is closed first
         if (!proposalExists(proposalId)) revert InvalidProposalId();
         Proposal memory proposal = proposals[proposalId];
@@ -260,4 +260,3 @@ contract QuestController is Ownable, Pausable, EIP712 {
         return QuestStatus.Open;
     }
 }
-      
