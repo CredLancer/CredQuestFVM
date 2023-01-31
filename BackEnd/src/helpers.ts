@@ -28,3 +28,12 @@ export async function uploadToIPFS(file: Buffer) {
   const res = await lighthouse.uploadBuffer(file, LIGHTHOUSE_API_KEY);
   return res.data;
 }
+
+export async function uploadJSONtoIPFS(obj: any) {
+  const res = await lighthouse.uploadBuffer(
+    Buffer.from(JSON.stringify(obj), "utf-8"),
+    LIGHTHOUSE_API_KEY,
+    "application/json"
+  );
+  return res.data;
+}
