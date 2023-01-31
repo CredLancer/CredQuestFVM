@@ -26,3 +26,12 @@ export async function getOrganizationContractDomain() {
     verifyingContract: ORGANIZATION_CONTROLLER_ADDRESS,
   };
 }
+
+export async function getQuestContractDomain() {
+  return {
+    name: "Quest Controller",
+    version: "1",
+    chainId: CHAIN_ID,
+    verifyingContract: QUEST_CONTROLLER_ADDRESS,
+  };
+}

@@ -5,9 +5,11 @@
   "license": "MIT",
   "scripts": {
     "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\"",
+    "dev:js": "nodemon -q dist/index.js",
+    "migrate": "prisma migrate dev --name init",
     "generate": "prisma generate",
     "studio": "prisma studio",
-    "migrate": "prisma migrate dev --name init"
+    "watch": "npx tsc --watch"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
