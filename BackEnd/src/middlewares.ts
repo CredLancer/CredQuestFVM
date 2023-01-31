@@ -78,7 +78,6 @@ export function file(name: string, type: string) {
           location: "body",
         };
       }
-      console.log(error);
       if (error) {
         if (typeof (req as any).fileErrors === "object") {
           (req as any).fileErrors.push(error);
@@ -90,35 +89,6 @@ export function file(name: string, type: string) {
     });
   };
 }
-
-// export function file(name, type) {
-//     return (req, res, next) => {
-//         let error;
-//         if (!req.files || !req.files[name]) {
-//             error = {
-//                 msg: "file not found",
-//                 param: name,
-//                 location: "body"
-//             };
-//         } else {
-//             const file = req.files[name];
-//             if (!file.mimetype.includes(type)) {
-//                 error = {
-//                     msg: "invalid file format",
-//                     param: name,
-//                     location: "body"
-//                 };
-//             }
-//         }
-//         if (!error) return next();
-//         if (typeof req.fileErrors === 'object') {
-//             req.fileErrors.push(error);
-//         } else {
-//             req.fileErrors = [error];
-//         }
-//         return next();
-//     }
-// }
 
 // export function files(name, type, min = 1, max = 5) {
 //     return (req, res, next) => {

@@ -21,7 +21,7 @@ contract OrganizationController is Ownable, Pausable, EIP712 {
     mapping(address => uint256) public organizationIds; // f: (adminAddress) -> organizationId
 
     address public signer;
-    mapping(uint256 => uint256) public nonces;
+    mapping(uint256 => bool) public nonceUsed;
 
     uint256 public totalOrganizations;
 
@@ -82,9 +82,10 @@ contract OrganizationController is Ownable, Pausable, EIP712 {
         bytes calldata signature,
         uint256 nonce
     ) public whenNotPaused {
-        if (nonces[nonce] != 0) revert InvalidNonce();
+        if (nonceUsed[nonce]) revert InvalidNonce();
         if (organizationIds[msg.sender] != 0)
             revert OrganizationsPerAddressLimitReached();
+
         bytes32 digest = _hashTypedDataV4(
             keccak256(
                 abi.encode(
@@ -100,6 +101,8 @@ contract OrganizationController is Ownable, Pausable, EIP712 {
         );
         address _signer = digest.recover(signature);
         if (_signer != signer) revert InvalidSignature();
+        nonceUsed[nonce] = true;
+
         uint256 orgId = ++totalOrganizations;
         organizations[orgId] = Organization({
             id: orgId,
@@ -127,7 +130,7 @@ contract OrganizationController is Ownable, Pausable, EIP712 {
         bytes memory signature,
         uint256 nonce
     ) public whenNotPaused onlyAdmin(orgId) {
-        if (nonces[nonce] != 0) revert InvalidNonce();
+        if (nonceUsed[nonce]) revert InvalidNonce();
         bytes32 digest = _hashTypedDataV4(
             keccak256(
                 abi.encode(
@@ -142,6 +145,8 @@ contract OrganizationController is Ownable, Pausable, EIP712 {
         );
         address _signer = digest.recover(signature);
         if (_signer != signer) revert InvalidSignature();
+        nonceUsed[nonce] = true;
+
         bytes memory oldImageCID = organizations[orgId].imageCID;
         organizations[orgId].imageCID = newImageCID;
         emit OrganizationImageCIDChanged(orgId, oldImageCID, newImageCID);
