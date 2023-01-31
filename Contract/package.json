@@ -3,7 +3,8 @@
   "scripts": {
     "build": "hardhat compile",
     "test": "hardhat test",
-    "coverage": "hardhat coverage"
+    "coverage": "hardhat coverage",
+    "deploy": "hardhat run ./scripts/deploy.ts --network hyperspace"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.1",
