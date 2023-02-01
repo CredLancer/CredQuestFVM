@@ -108,3 +108,13 @@ model ProposalStatusChange {
 
   @@id([transactionHash, blockNumber, transactionIndex, logIndex])
 }
+
+model Lancer {
+  address     String  @id
+  nonce       String
+  imageCID    String?
+  email       String?
+  name        String?
+  description String?
+  registered  Boolean @default(false)
+}
