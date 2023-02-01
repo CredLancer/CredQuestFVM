@@ -93,7 +93,7 @@ const Dashboard: NextPage = () => {
 
             <GridItem alignSelf="center" justifySelf="center">
               <Button
-                onClick={() => router.push("create-quest")}
+                onClick={() => router.push("/quests?tab=1")}
                 colorScheme="blue"
               >
                 Create Quest

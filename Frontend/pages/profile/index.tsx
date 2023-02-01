@@ -104,13 +104,13 @@ const UserProfile: NextPage = () => {
             <GridItem alignSelf="center" justifySelf="center">
               <VStack>
                 <Button
-                  onClick={() => router.push("create-quest")}
+                  onClick={() => router.push("/quests?tab=1")}
                   colorScheme="blue"
                 >
                   Create Quest
                 </Button>
                 <Button
-                  onClick={() => router.push("quests")}
+                  onClick={() => router.push("/quests?tab=0")}
                   colorScheme="blue"
                   variant="outline"
                 >
