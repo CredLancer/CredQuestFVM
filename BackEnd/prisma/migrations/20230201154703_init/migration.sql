@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE `Lancer` ADD COLUMN `registered` BOOLEAN NOT NULL DEFAULT false,
+    MODIFY `imageCID` VARCHAR(191) NULL,
+    MODIFY `email` VARCHAR(191) NULL,
+    MODIFY `name` VARCHAR(191) NULL,
+    MODIFY `description` VARCHAR(191) NULL;
