@@ -53,6 +53,7 @@ export async function signForQuestCreation(data: {
   orgId: string;
   questCID: string;
   reward: string;
+  deadline: string;
   nonce: string;
 }) {
   const types = {
@@ -60,6 +61,7 @@ export async function signForQuestCreation(data: {
       { name: "orgId", type: "uint256" },
       { name: "questCID", type: "bytes" },
       { name: "reward", type: "uint256" },
+      { name: "deadline", type: "uint256" },
       { name: "nonce", type: "uint256" },
     ],
   };
@@ -81,7 +83,7 @@ export async function signForProposalCreation(data: {
     SendProposal: [
       { name: "questId", type: "uint256" },
       { name: "proposer", type: "address" },
-      { name: "proposalCID", type: "string" },
+      { name: "proposalCID", type: "bytes" },
       { name: "nonce", type: "uint256" },
     ],
   };
