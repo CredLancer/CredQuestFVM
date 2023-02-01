@@ -50,7 +50,6 @@ export const Page: FC<{ children?: React.ReactNode }> = ({ children }) => {
           </Stack>
         </Box>
         <>{children}</>
-        <Footer />
       </Flex>
     </>
   );
