@@ -15,6 +15,7 @@ import {
   FormLabel,
   Input,
   Textarea,
+  Spinner,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import Head from "next/head";
@@ -27,40 +28,36 @@ import { useRouter } from "next/router";
 import { QuestDisplayPage } from "../../components/Page/QuestDisplay";
 import { useForm } from "react-hook-form";
 import { CheckCircleIcon } from "@chakra-ui/icons";
+import { useMutation, useQuery } from "react-query";
+import { OrganizationService, QuestService } from "../../services";
 
 export const CreateQuestView = () => {
+  const { address } = useAccount();
   const { handleSubmit, register } = useForm();
-  //   const isFirstTime = false;
-  const [submitStatus, setStatus] = useState<"" | "success" | "error">("");
+  const { data: organization, isLoading } = useQuery(
+    ["organization.address", address],
+    () => OrganizationService.findOrganizationByAddress(`${address}`)
+  );
+
+  const {
+    mutate,
+    isLoading: isSubmitting,
+    error,
+    isSuccess,
+  } = useMutation(QuestService.createQuest);
 
   const onSubmit = (model: any) => {
-    console.log({ model });
-    setStatus("success");
+    mutate({
+      title: model.title,
+      description: model.description,
+      reward: Number(model.reward),
+      orgId: Number(organization.org.id),
+    });
   };
 
-  return submitStatus === "success" ? (
-    <Box>
-      <Flex
-        direction="column"
-        alignItems="center"
-        justifyContent="center"
-        gap="7"
-      >
-        <Heading as="h3">Quest Created Successfully</Heading>
+  console.log({ error, organization, isSuccess });
 
-        <Box>
-          <CheckCircleIcon
-            width="=100px"
-            height="100px"
-            color="white"
-            stroke="green"
-          />
-        </Box>
-
-        <Text>Your Quest has been successfully created!</Text>
-      </Flex>
-    </Box>
-  ) : (
+  return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Heading textAlign="center" as="h3" mb="10">
         Fill form to create Quest
@@ -126,7 +123,7 @@ export const CreateQuestView = () => {
               bg="white.2"
               borderRadius="2px"
               id="skills"
-              type="number"
+              type="text"
               color="black.5"
               {...register("skills")}
             />
@@ -160,7 +157,7 @@ export const CreateQuestView = () => {
         </GridItem>
         <GridItem colSpan={4}>
           <FormControl>
-            <FormLabel htmlFor="credentials">
+            <FormLabel htmlFor="description">
               Description of Quest (3000-10000 characters)
             </FormLabel>
             <Textarea
@@ -175,7 +172,7 @@ export const CreateQuestView = () => {
         </GridItem>
         <GridItem colSpan={4}>
           <Button width="100%" type="submit" colorScheme="purple">
-            CREATE
+            {isSubmitting ? <Spinner /> : "CREATE"}
           </Button>
         </GridItem>
       </Grid>

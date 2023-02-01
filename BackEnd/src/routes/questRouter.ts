@@ -40,7 +40,7 @@ questRouter.post(
     console.log(reward);
 
     const organization = await prisma.organization.findUnique({
-      where: { id: orgId },
+      where: { id: `${orgId}` },
     });
     if (!organization)
       return res.status(404).json({ message: "organization not found" });
