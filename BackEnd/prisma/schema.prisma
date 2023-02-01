@@ -76,6 +76,7 @@ model Quest {
   status      QuestStatus  @default(Open)
   questCID    String
   orgId       String
+  deadline    DateTime
   blockNumber Int
   org         Organization @relation(fields: [orgId], references: [id])
 

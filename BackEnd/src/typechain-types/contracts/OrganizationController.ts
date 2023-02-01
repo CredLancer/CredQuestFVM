@@ -33,7 +33,7 @@ export interface OrganizationControllerInterface extends utils.Interface {
     "changeAdmin(uint256,address)": FunctionFragment;
     "createOrganization(string,bytes,bytes,uint256)": FunctionFragment;
     "exists(uint256)": FunctionFragment;
-    "nonces(uint256)": FunctionFragment;
+    "nonceUsed(uint256)": FunctionFragment;
     "organizationIds(address)": FunctionFragment;
     "organizations(uint256)": FunctionFragment;
     "owner()": FunctionFragment;
@@ -55,7 +55,7 @@ export interface OrganizationControllerInterface extends utils.Interface {
       | "changeAdmin"
       | "createOrganization"
       | "exists"
-      | "nonces"
+      | "nonceUsed"
       | "organizationIds"
       | "organizations"
       | "owner"
@@ -93,7 +93,7 @@ export interface OrganizationControllerInterface extends utils.Interface {
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
-    functionFragment: "nonces",
+    functionFragment: "nonceUsed",
     values: [PromiseOrValue<BigNumberish>]
   ): string;
   encodeFunctionData(
@@ -149,7 +149,7 @@ export interface OrganizationControllerInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "exists", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "nonces", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "nonceUsed", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "organizationIds",
     data: BytesLike
@@ -332,10 +332,10 @@ export interface OrganizationController extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[boolean]>;
 
-    nonces(
+    nonceUsed(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<[boolean]>;
 
     organizationIds(
       arg0: PromiseOrValue<string>,
@@ -423,10 +423,10 @@ export interface OrganizationController extends BaseContract {
     overrides?: CallOverrides
   ): Promise<boolean>;
 
-  nonces(
+  nonceUsed(
     arg0: PromiseOrValue<BigNumberish>,
     overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  ): Promise<boolean>;
 
   organizationIds(
     arg0: PromiseOrValue<string>,
@@ -512,10 +512,10 @@ export interface OrganizationController extends BaseContract {
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    nonces(
+    nonceUsed(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<boolean>;
 
     organizationIds(
       arg0: PromiseOrValue<string>,
@@ -661,7 +661,7 @@ export interface OrganizationController extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    nonces(
+    nonceUsed(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
@@ -746,7 +746,7 @@ export interface OrganizationController extends BaseContract {
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    nonces(
+    nonceUsed(
       arg0: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
