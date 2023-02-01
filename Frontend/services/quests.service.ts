@@ -13,6 +13,9 @@ export class QuestService {
     return fetch(`${BASE_URL}/quest`, {
       method: "POST",
       body: JSON.stringify(model),
-    });
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((res) => res.json());
   }
 }

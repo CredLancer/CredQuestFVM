@@ -47,7 +47,6 @@ type LogoInfo = {
 };
 
 const UserProfile: NextPage = () => {
-  const router = useRouter();
   const { address } = useAccount();
   const { data: signer } = useSigner();
   const provider = useWebSocketProvider();

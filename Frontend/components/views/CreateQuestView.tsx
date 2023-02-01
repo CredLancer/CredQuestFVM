@@ -1,38 +1,36 @@
 import {
-  Box,
   Button,
-  Container,
-  Flex,
   Grid,
   GridItem,
   Heading,
-  Text,
-  Link,
-  SkeletonCircle,
-  HStack,
-  VStack,
   FormControl,
   FormLabel,
   Input,
   Textarea,
   Spinner,
 } from "@chakra-ui/react";
-import type { NextPage } from "next";
-import Head from "next/head";
-import styles from "../styles/Home.module.css";
-import { useAccount, useSendTransaction } from "wagmi";
-import { BigNumber } from "@ethersproject/bignumber";
-import { useState } from "react";
-import { SelectRoleModal } from "../../components/Modals/SelectRole";
-import { useRouter } from "next/router";
-import { QuestDisplayPage } from "../../components/Page/QuestDisplay";
+import {
+  useAccount,
+  useSigner,
+  useWebSocketProvider,
+  useContract,
+} from "wagmi";
 import { useForm } from "react-hook-form";
-import { CheckCircleIcon } from "@chakra-ui/icons";
 import { useMutation, useQuery } from "react-query";
 import { OrganizationService, QuestService } from "../../services";
+import { QUEST_CONTRACT } from "../../utils/constants";
+import QUEST_ABI from "../../assets/contracts/QuestController.json";
+import { BigNumber } from "ethers";
 
 export const CreateQuestView = () => {
   const { address } = useAccount();
+  const { data: signer } = useSigner();
+  const provider = useWebSocketProvider();
+  const contract = useContract({
+    address: QUEST_CONTRACT,
+    abi: QUEST_ABI,
+    signerOrProvider: signer,
+  });
   const { handleSubmit, register } = useForm();
   const { data: organization, isLoading } = useQuery(
     ["organization.address", address],
@@ -47,12 +45,37 @@ export const CreateQuestView = () => {
   } = useMutation(QuestService.createQuest);
 
   const onSubmit = (model: any) => {
-    mutate({
-      title: model.title,
-      description: model.description,
-      reward: Number(model.reward),
-      orgId: Number(organization.org.id),
-    });
+    const orgId = organization.org.id;
+    mutate(
+      {
+        title: model.title,
+        description: model.description,
+        reward: Number(model.reward),
+        orgId,
+      },
+      {
+        onSuccess: async (response) => {
+          console.log({ response });
+          const { questCID, signature, nonce } = response;
+          const deadline = new Date(model.deadline).getTime() / 1000;
+          const reward = BigNumber.from(model.reward);
+          await contract?.createQuest(
+            questCID,
+            reward,
+            orgId,
+            deadline,
+            signature,
+            nonce,
+            {
+              maxPriorityFeePerGas: await provider?.send(
+                "eth_maxPriorityFeePerGas",
+                []
+              ),
+            }
+          );
+        },
+      }
+    );
   };
 
   console.log({ error, organization, isSuccess });
