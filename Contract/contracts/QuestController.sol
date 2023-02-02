@@ -3,9 +3,11 @@ pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "./OrganizationController.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
+
+import "./Credential.sol";
+import "./OrganizationController.sol";
 
 contract QuestController is Ownable, Pausable, EIP712 {
     using ECDSA for bytes32;
@@ -49,6 +51,7 @@ contract QuestController is Ownable, Pausable, EIP712 {
     uint256 public totalProposals;
     address public signer;
 
+    Credential public credential;
     OrganizationController public organizationController;
 
     event QuestCreated(
@@ -93,10 +96,12 @@ contract QuestController is Ownable, Pausable, EIP712 {
     error InvalidSignature();
     error DeadlineAlreadyPassed();
 
-    constructor(OrganizationController _organizationController)
-        EIP712("Quest Controller", "1")
-    {
+    constructor(
+        OrganizationController _organizationController,
+        Credential _credential
+    ) EIP712("Quest Controller", "1") {
         organizationController = _organizationController;
+        credential = _credential;
         signer = msg.sender;
     }
 

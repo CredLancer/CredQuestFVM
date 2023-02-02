@@ -1,4 +1,8 @@
-import { OrganizationController, QuestController } from "../typechain-types";
+import {
+  OrganizationController,
+  QuestController,
+  Credential,
+} from "../typechain-types";
 import { ethers } from "hardhat";
 import { ethers as e, Signer } from "ethers";
 import { expect } from "chai";
@@ -56,7 +60,8 @@ describe("Quest Controller Contract", function () {
   const accounts: string[] = [];
   let wallet: e.Wallet;
   let organizationController: OrganizationController,
-    questController: QuestController;
+    questController: QuestController,
+    credentialContract: Credential;
   let lastNonce = 0;
 
   this.beforeAll(async function () {
@@ -72,9 +77,15 @@ describe("Quest Controller Contract", function () {
     organizationController = await OrganizationController.deploy();
     await organizationController.deployed();
 
+    // deploy the credential contract
+    const Credential = await ethers.getContractFactory("Credential");
+    credentialContract = await Credential.deploy();
+    await credentialContract.deployed();
+
     const QuestController = await ethers.getContractFactory("QuestController");
     questController = await QuestController.deploy(
-      organizationController.address
+      organizationController.address,
+      credentialContract.address
     );
     await questController.deployed();
 

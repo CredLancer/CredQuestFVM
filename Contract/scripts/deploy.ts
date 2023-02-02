@@ -16,11 +16,22 @@ async function main() {
     `The organization contract is deployed to address: ${organizationController.address}`
   );
 
+  // deploy the credentials contract
+  console.log("Deploying the organization contract");
+  const Credential = await ethers.getContractFactory("Credential");
+  const credential = await Credential.deploy({
+    maxPriorityFeePerGas: await provider.send("eth_maxPriorityFeePerGas", []),
+  });
+  console.log(
+    `The credential contract is deployed to address: ${credential.address}`
+  );
+
   // deploy the quests contract
   console.log("Deploying the quest contract");
   const QuestController = await ethers.getContractFactory("QuestController");
   const questController = await QuestController.deploy(
     organizationController.address,
+    credential.address,
     {
       maxPriorityFeePerGas: await provider.send("eth_maxPriorityFeePerGas", []),
     }
