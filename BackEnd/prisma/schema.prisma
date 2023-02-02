@@ -73,7 +73,7 @@ enum ProposalStatus {
 
 model Quest {
   id          String       @id
-  value       BigInt
+  value       String
   status      QuestStatus  @default(Open)
   questCID    String
   orgId       String
