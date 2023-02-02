@@ -83,7 +83,7 @@ export async function signForProposalCreation(data: {
     SendProposal: [
       { name: "questId", type: "uint256" },
       { name: "proposer", type: "address" },
-      { name: "proposalCID", type: "string" },
+      { name: "proposalCID", type: "bytes" },
       { name: "nonce", type: "uint256" },
     ],
   };

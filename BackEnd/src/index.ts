@@ -5,6 +5,8 @@ import web3EventListeners from "./web3EventListeners";
 import ipfsRouter from "./routes/ipfsRouter";
 import organizationRouter from "./routes/organizationRouter";
 import questRouter from "./routes/questRouter";
+import lancerRouter from "./routes/lancerRouter";
+import proposalRouter from "./routes/proposalRouter";
 
 const app = express();
 
@@ -18,6 +20,8 @@ app.get("/", (req, res) => {
 app.use("/ipfs", ipfsRouter);
 app.use("/organization", organizationRouter);
 app.use("/quest", questRouter);
+app.use("/lancer", lancerRouter);
+app.use("/proposal", proposalRouter);
 
 web3EventListeners();
 
