@@ -55,6 +55,7 @@ contract QuestController is Ownable, Pausable, EIP712 {
         uint256 indexed questId,
         uint256 indexed organizationId,
         bytes questCID,
+        uint256 deadline,
         uint256 reward
     );
     event ProposalCreated(
@@ -155,7 +156,7 @@ contract QuestController is Ownable, Pausable, EIP712 {
             deadline: deadline,
             winnerProposalId: 0
         });
-        emit QuestCreated(questId, orgId, questCID, reward);
+        emit QuestCreated(questId, orgId, questCID, deadline, reward);
     }
 
     function sendProposal(

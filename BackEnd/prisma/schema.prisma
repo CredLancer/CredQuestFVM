@@ -34,6 +34,7 @@ model Organization {
   description              String?
   video                    String?
   blockNumber              Int?
+  email                    String?
   OrganizationDetailUpdate OrganizationDetailUpdate[]
   Quest                    Quest[]
 }
@@ -72,10 +73,11 @@ enum ProposalStatus {
 
 model Quest {
   id          String       @id
-  value       BigInt
+  value       String
   status      QuestStatus  @default(Open)
   questCID    String
   orgId       String
+  deadline    DateTime
   blockNumber Int
   org         Organization @relation(fields: [orgId], references: [id])
 
@@ -105,4 +107,14 @@ model ProposalStatusChange {
   proposal         Proposal       @relation(fields: [proposalId], references: [id])
 
   @@id([transactionHash, blockNumber, transactionIndex, logIndex])
+}
+
+model Lancer {
+  address     String  @id
+  nonce       String
+  imageCID    String?
+  email       String?
+  name        String?
+  description String?
+  registered  Boolean @default(false)
 }

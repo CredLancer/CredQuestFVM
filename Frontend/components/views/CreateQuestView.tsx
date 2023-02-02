@@ -1,66 +1,93 @@
 import {
-  Box,
   Button,
-  Container,
-  Flex,
   Grid,
   GridItem,
   Heading,
-  Text,
-  Link,
-  SkeletonCircle,
-  HStack,
-  VStack,
   FormControl,
   FormLabel,
   Input,
   Textarea,
+  Spinner,
 } from "@chakra-ui/react";
-import type { NextPage } from "next";
-import Head from "next/head";
-import styles from "../styles/Home.module.css";
-import { useAccount, useSendTransaction } from "wagmi";
-import { BigNumber } from "@ethersproject/bignumber";
-import { useState } from "react";
-import { SelectRoleModal } from "../../components/Modals/SelectRole";
-import { useRouter } from "next/router";
-import { QuestDisplayPage } from "../../components/Page/QuestDisplay";
+import {
+  useAccount,
+  useSigner,
+  useWebSocketProvider,
+  useContract,
+} from "wagmi";
+import React from "react";
 import { useForm } from "react-hook-form";
-import { CheckCircleIcon } from "@chakra-ui/icons";
+import { useMutation, useQuery } from "react-query";
+import { OrganizationService, QuestService } from "../../services";
+import { QUEST_CONTRACT } from "../../utils/constants";
+import QUEST_ABI from "../../assets/contracts/QuestController.json";
+import { BigNumber } from "ethers";
+import { parseEther } from "ethers/lib/utils.js";
 
 export const CreateQuestView = () => {
+  const { address } = useAccount();
+  const { data: signer } = useSigner();
+  const provider = useWebSocketProvider();
+  const contract = useContract({
+    address: QUEST_CONTRACT,
+    abi: QUEST_ABI,
+    signerOrProvider: signer,
+  });
   const { handleSubmit, register } = useForm();
-  //   const isFirstTime = false;
-  const [submitStatus, setStatus] = useState<"" | "success" | "error">("");
+  const { data: organization, isLoading } = useQuery(
+    ["organization.address", address],
+    () => OrganizationService.findOrganizationByAddress(`${address}`)
+  );
+
+  const {
+    mutate,
+    isLoading: isSubmitting,
+    error,
+    isSuccess,
+  } = useMutation(QuestService.createQuest);
 
   const onSubmit = (model: any) => {
-    console.log({ model });
-    setStatus("success");
+    const orgId = organization.org.id;
+    mutate(
+      {
+        title: model.title,
+        description: model.description,
+        reward: parseEther(model.reward).toString(),
+        deadline: ((new Date(model.deadline).getTime() / 1000) | 0).toString(),
+        orgId,
+      },
+      {
+        onSuccess: async (response) => {
+          console.log({ response });
+          const { questCID, signature, nonce } = response;
+          const deadline = (
+            (new Date(model.deadline).getTime() / 1000) |
+            0
+          ).toString();
+          const reward = parseEther(model.reward).toString();
+          await contract?.createQuest(
+            questCID,
+            reward,
+            orgId,
+            deadline,
+            signature,
+            nonce,
+            {
+              maxPriorityFeePerGas: await provider?.send(
+                "eth_maxPriorityFeePerGas",
+                []
+              ),
+              value: reward,
+            }
+          );
+        },
+      }
+    );
   };
 
-  return submitStatus === "success" ? (
-    <Box>
-      <Flex
-        direction="column"
-        alignItems="center"
-        justifyContent="center"
-        gap="7"
-      >
-        <Heading as="h3">Quest Created Successfully</Heading>
+  console.log({ error, organization, isSuccess });
 
-        <Box>
-          <CheckCircleIcon
-            width="=100px"
-            height="100px"
-            color="white"
-            stroke="green"
-          />
-        </Box>
-
-        <Text>Your Quest has been successfully created!</Text>
-      </Flex>
-    </Box>
-  ) : (
+  return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Heading textAlign="center" as="h3" mb="10">
         Fill form to create Quest
@@ -126,7 +153,7 @@ export const CreateQuestView = () => {
               bg="white.2"
               borderRadius="2px"
               id="skills"
-              type="number"
+              type="text"
               color="black.5"
               {...register("skills")}
             />
@@ -152,6 +179,7 @@ export const CreateQuestView = () => {
               bg="white.2"
               borderRadius="2px"
               id="reward"
+              step="0.01"
               type="number"
               color="black.5"
               {...register("reward")}
@@ -160,7 +188,7 @@ export const CreateQuestView = () => {
         </GridItem>
         <GridItem colSpan={4}>
           <FormControl>
-            <FormLabel htmlFor="credentials">
+            <FormLabel htmlFor="description">
               Description of Quest (3000-10000 characters)
             </FormLabel>
             <Textarea
@@ -175,7 +203,7 @@ export const CreateQuestView = () => {
         </GridItem>
         <GridItem colSpan={4}>
           <Button width="100%" type="submit" colorScheme="purple">
-            CREATE
+            {isSubmitting ? <Spinner /> : "CREATE"}
           </Button>
         </GridItem>
       </Grid>

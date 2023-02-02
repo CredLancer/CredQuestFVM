@@ -10,7 +10,7 @@ export class OrganizationService {
   }
 
   static async findOrganizationByAddress(address: string) {
-    return fetch(`${BASE_URL}/organization/${address}`, {
+    return fetch(`${BASE_URL}/organization/admin/${address}`, {
       method: "GET",
     }).then((res) => res.json());
   }

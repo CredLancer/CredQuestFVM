@@ -54,13 +54,13 @@ const roles: RoleData[] = [
   {
     id: "org",
     name: "organization",
-    href: "/dashboard?user=org",
+    href: "/quests?tab=1",
     disabled: (mode) => mode === "create-quest",
   },
   {
     id: "hunter",
     name: "credlancer",
-    href: "/lancerDashboard?user=lancer",
+    href: "/quests?tab=0",
     disabled: (mode) => mode === "join-quest",
   },
 ];

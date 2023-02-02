@@ -41,6 +41,8 @@ import { useForm } from "react-hook-form";
 import { CheckCircleIcon } from "@chakra-ui/icons";
 import { DashboardLayout } from "../../components/Page/DashboardLayout";
 import { CreateQuestView, ListQuestsView } from "../../components/views";
+import { QuestService } from "../../services";
+import { useQuery } from "react-query";
 
 const ViewQuests: NextPage = () => {
   const { isConnected } = useAccount();
@@ -64,7 +66,7 @@ const ViewQuests: NextPage = () => {
       <Tabs
         variant="unstyled"
         colorScheme="cyan"
-        defaultIndex={Number(tab) ?? 0}
+        defaultIndex={Number(tab) || 0}
       >
         <TabList color="#321975" border="5px solid rgba(69, 76, 115, 0.88)">
           <Tab flex="1" _selected={selectedTab}>
