@@ -46,6 +46,7 @@ contract QuestController is Ownable, Pausable, EIP712 {
     mapping(uint256 => Proposal) public proposals; // f: (proposalId) -> proposal
     mapping(uint256 => mapping(address => uint256)) public proposalIds; // f: (questId, proposerAddress) -> proposalId
     mapping(uint256 => bool) public nonceUsed;
+    mapping(address => uint256) public balanceOf;
 
     uint256 public totalQuests;
     uint256 public totalProposals;
@@ -79,6 +80,11 @@ contract QuestController is Ownable, Pausable, EIP712 {
         address indexed worker,
         bytes workCID
     );
+    event FundTransferred(
+        address indexed lancer,
+        address indexed withdrawalAddress,
+        uint256 amount
+    );
 
     error InvalidOrganizationId();
     error Unauthorized();
@@ -95,6 +101,8 @@ contract QuestController is Ownable, Pausable, EIP712 {
     error InvalidNonce();
     error InvalidSignature();
     error DeadlineAlreadyPassed();
+    error FundTransferFailed();
+    error InsufficientBalance();
 
     constructor(
         OrganizationController _organizationController,
@@ -222,6 +230,15 @@ contract QuestController is Ownable, Pausable, EIP712 {
         emit WorkSubmitted(questId, proposalId, msg.sender, workCID);
     }
 
+    function withdraw(address withdrawalAddress) public {
+        if (balanceOf[msg.sender] == 0) revert InsufficientBalance();
+        uint256 amount = balanceOf[msg.sender];
+        balanceOf[msg.sender] = 0;
+
+        _transferFunds(withdrawalAddress, amount);
+        emit FundTransferred(msg.sender, withdrawalAddress, amount);
+    }
+
     function acceptProposal(uint256 proposalId) public {
         _changeProposalStatus(proposalId, ProposalStatus.Accepted);
     }
@@ -264,5 +281,10 @@ contract QuestController is Ownable, Pausable, EIP712 {
         if (quest.winnerProposalId != 0) return QuestStatus.Awarded;
         if (quest.deadline < block.timestamp) return QuestStatus.Closed;
         return QuestStatus.Open;
+    }
+
+    function _transferFunds(address receiver, uint256 amount) private {
+        (bool success, ) = receiver.call{value: amount}("");
+        if (!success) revert FundTransferFailed();
     }
 }
