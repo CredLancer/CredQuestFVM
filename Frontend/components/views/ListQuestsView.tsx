@@ -31,7 +31,6 @@ export const ListQuestsView = (lancer: number) => {
     <Grid mt="10" gap="6" gridTemplateColumns="1fr 1fr">
       {data?.quests?.length ? (
         data.quests.map((quest: any) => (
-          
           <GridItem colSpan={1} key={quest.id}>
             <ViewSingleQuest {...quest} />
           </GridItem>

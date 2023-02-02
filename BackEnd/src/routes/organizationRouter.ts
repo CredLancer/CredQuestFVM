@@ -22,7 +22,7 @@ organizationRouter.post(
   validate,
   async (req, res) => {
     console.log({ body: req.body });
-    const { admin, name } = req.body;
+    const { signature: userSignature, admin, name } = req.body;
     const image = req.file as Express.Multer.File;
     const organization = await prisma.organization.findFirst({
       where: { admin },
@@ -76,7 +76,7 @@ organizationRouter.get("/", paginate(10), validate, async (req, res) => {
 organizationRouter.put(
   "/imageCID/:orgId",
   file("image", "image"),
-  body("signature").isEthereumAddress(),
+  body("signature").isString(),
   body("signer").isEthereumAddress(),
   validate,
   async (req, res) => {
