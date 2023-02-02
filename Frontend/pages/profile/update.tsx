@@ -26,6 +26,7 @@ import {
   useContract,
   useContractWrite,
   usePrepareContractWrite,
+  useProvider,
   useSendTransaction,
   useSigner,
   useWebSocketProvider,
@@ -76,13 +77,13 @@ const UserProfile: NextPage = () => {
     formData.append("description", model.org_description);
     formData.append("email", model.email);
     formData.append("admin", address);
-    formData.append("signature", "signtaure");
+    formData.append("signature", "");
     mutate(formData, {
       onSuccess: async (response) => {
         console.log({ response });
         const { name, imageCID, signature, nonce } = response;
         contract?.createOrganization(name, imageCID, signature, nonce, {
-          maxPriorityFeePerGas: await provider?.send(
+          maxPriorityFeePerGas: await (provider as any)?.send(
             "eth_maxPriorityFeePerGas",
             []
           ),
@@ -91,7 +92,7 @@ const UserProfile: NextPage = () => {
     });
   };
 
-  console.log({ profile_data });
+  console.log({ provider, signer });
 
   const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
