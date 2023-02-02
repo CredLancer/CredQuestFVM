@@ -1,6 +1,8 @@
 export const BASE_URL =
   process.env.NEXT_API_BASE_URL ?? "http://localhost:8000";
 
+export const LIGHTHOUSE_URL = "https://gateway.lighthouse.storage/ipfs";
+
 /// CONTRACT CONSTANTS
 export const ORGANIZATION_CONTRACT =
   "0x175a9712B2251B4766e452a7580D621e90a5E867";

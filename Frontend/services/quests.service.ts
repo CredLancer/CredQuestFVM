@@ -1,4 +1,4 @@
-import { BASE_URL } from "../utils/constants";
+import { BASE_URL, LIGHTHOUSE_URL } from "../utils/constants";
 
 const LIMIT = 10;
 export class QuestService {
@@ -17,5 +17,11 @@ export class QuestService {
         "Content-Type": "application/json",
       },
     }).then((res) => res.json());
+  }
+
+  static async fetchQuestByCID(cid: string) {
+    return fetch(`${LIGHTHOUSE_URL}/f${cid}`, {
+      method: "GET",
+    });
   }
 }
