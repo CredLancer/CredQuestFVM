@@ -76,6 +76,7 @@ const UserProfile: NextPage = () => {
     formData.append("description", model.org_description);
     formData.append("email", model.email);
     formData.append("admin", address);
+    formData.append("signature", "signtaure");
     mutate(formData, {
       onSuccess: async (response) => {
         console.log({ response });

@@ -55,6 +55,7 @@ organizationRouter.post(
         type: SignatureType.OrganizationCreation,
       },
     });
+    console.log("Success", signature);
     res.json({ nonce, signature, imageCID, name });
   }
 );
