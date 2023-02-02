@@ -12,6 +12,7 @@ export const WEB3_RPC_URI = process.env.WEB3_RPC_URI || "";
 export const SIGNER_PRIVATE_KEY = process.env.SIGNER_PRIVATE_KEY || "";
 export const LIGHTHOUSE_API_KEY = process.env.LIGHTHOUSE_API_KEY || "";
 export const CHAIN_ID = 3141;
+export const NONCE_TEMPLATE = process.env.NONCE_MESSAGE || "The Nonce is: %";
 
 export const provider = new ethers.providers.JsonRpcProvider(
   WEB3_RPC_URI,
