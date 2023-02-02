@@ -33,14 +33,18 @@ questRouter.post(
   body("title").isLength({ min: 3 }),
   body("description").isString(),
   body("reward").isNumeric(),
+  body("deadline").isNumeric(),
   validate,
   async (req, res) => {
-    console.log(req.body);
-    const { orgId, title, description, reward } = req.body;
-    console.log(reward);
+    const { orgId, title, description, reward, deadline } = req.body;
+
+    if (new Date(parseInt(deadline) * 1000) <= new Date())
+      return res
+        .status(400)
+        .json({ message: "Deadline cannot be in the past" });
 
     const organization = await prisma.organization.findUnique({
-      where: { id: `${orgId}` },
+      where: { id: orgId },
     });
     if (!organization)
       return res.status(404).json({ message: "organization not found" });
@@ -57,6 +61,7 @@ questRouter.post(
       orgId,
       questCID,
       reward: rewardInWei.toString(),
+      deadline,
       nonce,
     });
     await prisma.signature.create({

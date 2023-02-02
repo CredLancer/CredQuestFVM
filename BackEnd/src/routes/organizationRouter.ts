@@ -22,7 +22,7 @@ organizationRouter.post(
   validate,
   async (req, res) => {
     console.log({ body: req.body });
-    const { admin, name } = req.body;
+    const { signature: userSignature, admin, name } = req.body;
     const image = req.file as Express.Multer.File;
     const organization = await prisma.organization.findFirst({
       where: { admin },
@@ -76,7 +76,7 @@ organizationRouter.get("/", paginate(10), validate, async (req, res) => {
 organizationRouter.put(
   "/imageCID/:orgId",
   file("image", "image"),
-  body("signature").isEthereumAddress(),
+  body("signature").isString(),
   body("signer").isEthereumAddress(),
   validate,
   async (req, res) => {
@@ -99,7 +99,7 @@ organizationRouter.put(
       return res.status(400).json({ message: "image not changed" });
     const nonce = await getNonce();
 
-    // check the signature
+    // TODO: verify the signature
 
     const signature = await signForOrganizationImageCIDUpdate({
       orgId,
@@ -115,6 +115,37 @@ organizationRouter.put(
       },
     });
     res.json({ nonce, signature, imageCID });
+  }
+);
+
+organizationRouter.put(
+  "/:id",
+  body("description").isString().optional({ nullable: true }),
+  body("email").isString().optional({ nullable: true }),
+  body("video").isString().optional({ nullable: true }),
+  body("signature").isString(),
+  validate,
+  async (req, res) => {
+    const { id } = req.params;
+    const { description, email, video, signature } = req.body;
+    const organization = await prisma.organization.findUnique({
+      where: { id },
+    });
+    if (!organization)
+      return res.status(404).json({ message: "Organization not found" });
+    if (!description && !email && !video)
+      return res.status(400).json({ message: "nothing parsed to update" });
+
+    // TODO: verify the signature
+
+    await prisma.organization.update({
+      where: { id },
+      data: { description, email, video },
+    });
+
+    res.json({
+      organization: await prisma.organization.findUnique({ where: { id } }),
+    });
   }
 );
 

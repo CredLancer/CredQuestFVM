@@ -22,6 +22,7 @@ import { OrganizationService, QuestService } from "../../services";
 import { QUEST_CONTRACT } from "../../utils/constants";
 import QUEST_ABI from "../../assets/contracts/QuestController.json";
 import { BigNumber } from "ethers";
+import { parseEther } from "ethers/lib/utils.js";
 
 export const CreateQuestView = () => {
   const { address } = useAccount();
@@ -51,15 +52,19 @@ export const CreateQuestView = () => {
       {
         title: model.title,
         description: model.description,
-        reward: Number(model.reward),
+        reward: parseEther(model.reward).toString(),
+        deadline: ((new Date(model.deadline).getTime() / 1000) | 0).toString(),
         orgId,
       },
       {
         onSuccess: async (response) => {
           console.log({ response });
           const { questCID, signature, nonce } = response;
-          const deadline = new Date(model.deadline).getTime() / 1000;
-          const reward = BigNumber.from(model.reward);
+          const deadline = (
+            (new Date(model.deadline).getTime() / 1000) |
+            0
+          ).toString();
+          const reward = parseEther(model.reward).toString();
           await contract?.createQuest(
             questCID,
             reward,
@@ -72,6 +77,7 @@ export const CreateQuestView = () => {
                 "eth_maxPriorityFeePerGas",
                 []
               ),
+              value: reward,
             }
           );
         },
@@ -173,6 +179,7 @@ export const CreateQuestView = () => {
               bg="white.2"
               borderRadius="2px"
               id="reward"
+              step="0.01"
               type="number"
               color="black.5"
               {...register("reward")}

@@ -26,7 +26,7 @@ export const ListQuestsView = () => {
     </Flex>
   ) : (
     <List mt="10">
-      {data.quests?.length ? (
+      {data?.quests?.length ? (
         <ListItem>
           <Flex alignItems="stretch" justifyContent="flex-start" gap="8">
             <Box>
