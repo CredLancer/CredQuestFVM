@@ -1,6 +1,14 @@
+import { PrismaClient } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
-import { multerUploader } from "./helpers";
+import {
+  generateNonce,
+  getNonceMessage,
+  multerUploader,
+  verifySignature,
+} from "./helpers";
+
+const prisma = new PrismaClient();
 
 export function paginate(defaultLimit = 10) {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -151,4 +159,43 @@ export function validate(req: Request, res: Response, next: NextFunction) {
     return res.status(422).json({ errors });
   }
   next();
+}
+
+export function authorizeUser(
+  addressField: string,
+  signatureField: string,
+  registering: boolean = false
+) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const address = req.body[addressField];
+    const signature = req.body[signatureField];
+
+    // get the lancer
+    let lancer = await prisma.lancer.findUnique({
+      where: { address: address as string },
+    });
+    if (registering) {
+      if (!lancer)
+        return res.status(400).json({ message: "nonce not generated yet" });
+      if (lancer.registered)
+        return res.status(400).json({ message: "user already registered" });
+    } else {
+      if (!lancer || !lancer.registered)
+        return res.status(400).json({ message: "lancer not registered" });
+    }
+
+    // Verify Signature
+    const nonceMessage = getNonceMessage(lancer.nonce);
+    const isSignValid = verifySignature(nonceMessage, signature, address);
+    if (!isSignValid)
+      return res.status(401).json({ message: "invalid signature" });
+
+    // update the nonce
+    await prisma.lancer.update({
+      data: { nonce: generateNonce() },
+      where: { address },
+    });
+
+    next();
+  };
 }

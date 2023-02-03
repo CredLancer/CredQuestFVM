@@ -71,6 +71,18 @@ enum ProposalStatus {
   Rejected
 }
 
+model QuestFile {
+  cid         String @id
+  title       String
+  description String
+}
+
+model ProposalFile {
+  cid                  String   @id
+  description          String
+  approxCompletionTime DateTime
+}
+
 model Quest {
   id          String       @id
   value       String
@@ -85,14 +97,15 @@ model Quest {
 }
 
 model Proposal {
-  id                   String                 @id
-  proposer             String
-  blockNumber          Int
-  description          String?
-  fileCID              String
-  status               ProposalStatus         @default(Proposed)
-  questId              String
-  quest                Quest                  @relation(fields: [questId], references: [id])
+  id          String         @id
+  proposer    String
+  blockNumber Int
+  description String?
+  fileCID     String
+  status      ProposalStatus @default(Proposed)
+  questId     String
+  quest       Quest          @relation(fields: [questId], references: [id])
+
   ProposalStatusChange ProposalStatusChange[]
 }
 
