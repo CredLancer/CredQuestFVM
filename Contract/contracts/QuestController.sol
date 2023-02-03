@@ -276,6 +276,7 @@ contract QuestController is Ownable, Pausable, EIP712 {
     {
         Proposal memory proposal = proposals[proposalId];
         Quest memory quest = quests[proposal.questId];
+        ProposalStatus oldStatus = proposal.status;
 
         // check the conditions
         if (statusOfQuest(proposal.questId) == QuestStatus.Awarded)
@@ -294,6 +295,13 @@ contract QuestController is Ownable, Pausable, EIP712 {
 
         // mint credential nft
         credential.mint(proposal.proposer, proposal.questId, 1, "");
+
+        emit ProposalStatusChanged(
+            proposal.questId,
+            proposalId,
+            oldStatus,
+            ProposalStatus.Awarded
+        );
     }
 
     function withdraw(address withdrawalAddress) public {
