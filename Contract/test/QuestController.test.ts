@@ -370,6 +370,54 @@ describe("Quest Controller Contract", function () {
   });
 
   describe("Send Proposal", function () {
-    it("Should not send the proposal if the admin of the organzation", async function () {});
+    it("Should not send the proposal if the sign is invalid", async function () {
+      const nonce = lastNonce;
+      const signature = await wallet._signTypedData(
+        questContractDomain,
+        typesForSendProposal,
+        {
+          questId: "0",
+          proposer: accounts[4],
+          proposalCID:
+            "0x0170122039febd81cc2eddc5bd20afeb13d86e6e511b40468296f10562e4b6c3fe74656b",
+          nonce,
+        }
+      );
+
+      await expect(
+        questController
+          .connect(signers[4])
+          .sendProposal(
+            1,
+            "0x0170122039febd81cc2eddc5bd20afeb13d86e6e511b40468296f10562e4b6c3fe74656b",
+            signature,
+            nonce
+          )
+      ).to.be.revertedWithCustomError(questController, "InvalidSignature");
+    });
+
+    it("Should send the proposal - 1", async function () {
+      const nonce = lastNonce;
+      const signature = await wallet._signTypedData(
+        questContractDomain,
+        typesForSendProposal,
+        {
+          questId: "1",
+          proposer: accounts[4],
+          proposalCID:
+            "0x0170122039febd81cc2eddc5bd20afeb13d86e6e511b40468296f10562e4b6c3fe74656b",
+          nonce,
+        }
+      );
+
+      await questController
+        .connect(signers[4])
+        .sendProposal(
+          1,
+          "0x0170122039febd81cc2eddc5bd20afeb13d86e6e511b40468296f10562e4b6c3fe74656b",
+          signature,
+          nonce
+        );
+    });
   });
 });
