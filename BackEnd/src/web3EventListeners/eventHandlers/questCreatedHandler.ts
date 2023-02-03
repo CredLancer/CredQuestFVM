@@ -7,7 +7,7 @@ export default async function questCreatedHandler(
   eventEmitted: QuestCreatedEvent
 ) {
   const { blockNumber, args } = eventEmitted;
-  const { questId, organizationId, questCID, reward } = args;
+  const { questId, organizationId, questCID, reward, deadline } = args;
 
   console.log(`\n---${eventEmitted.event}---`);
   console.log(args);
@@ -21,6 +21,7 @@ export default async function questCreatedHandler(
       id: questId.toString(),
       questCID,
       value: Number(reward),
+      deadline: new Date(Number(deadline) * 1000).toString(),
       blockNumber,
       org: { connect: { id: organizationId.toString() } },
     },
