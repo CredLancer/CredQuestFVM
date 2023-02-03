@@ -67,6 +67,7 @@ const ViewQuests: NextPage = () => {
         variant="unstyled"
         colorScheme="cyan"
         defaultIndex={Number(tab) || 0}
+        isLazy
       >
         <TabList color="#321975" border="5px solid rgba(69, 76, 115, 0.88)">
           <Tab flex="1" _selected={selectedTab}>
@@ -83,7 +84,16 @@ const ViewQuests: NextPage = () => {
             </Box>
           </TabPanel>
           <TabPanel>
-            <Box h="100%" p="12" color="black.2" bg="#c9c9c9" borderRadius={7}>
+            <Box
+              h="100%"
+              p="12"
+              w="full"
+              maxW="800px"
+              mx="auto"
+              color="black.2"
+              bg="#c9c9c9"
+              borderRadius={7}
+            >
               <CreateQuestView />
             </Box>
           </TabPanel>

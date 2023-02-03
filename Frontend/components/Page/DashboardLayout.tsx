@@ -61,7 +61,7 @@ export const DashboardLayout: React.FC<ComponentProps> = ({ children }) => {
         <Box flex="1" borderRight="1px solid #3B2095" maxW="250px">
           <Sidebar />
         </Box>
-        <Box flex="1" pt="12">
+        <Box flex="1" overflow="auto" pt="12">
           {children}
         </Box>
       </Flex>
