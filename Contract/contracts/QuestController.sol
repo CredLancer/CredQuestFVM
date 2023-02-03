@@ -3,9 +3,11 @@ pragma solidity ^0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
-import "./OrganizationController.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/cryptography/EIP712.sol";
+
+import "./Credential.sol";
+import "./OrganizationController.sol";
 
 contract QuestController is Ownable, Pausable, EIP712 {
     using ECDSA for bytes32;
@@ -13,7 +15,8 @@ contract QuestController is Ownable, Pausable, EIP712 {
     enum ProposalStatus {
         Proposed,
         Accepted,
-        Rejected
+        Rejected,
+        Awarded
     }
 
     enum QuestStatus {
@@ -44,11 +47,13 @@ contract QuestController is Ownable, Pausable, EIP712 {
     mapping(uint256 => Proposal) public proposals; // f: (proposalId) -> proposal
     mapping(uint256 => mapping(address => uint256)) public proposalIds; // f: (questId, proposerAddress) -> proposalId
     mapping(uint256 => bool) public nonceUsed;
+    mapping(address => uint256) public balanceOf;
 
     uint256 public totalQuests;
     uint256 public totalProposals;
     address public signer;
 
+    Credential public credential;
     OrganizationController public organizationController;
 
     event QuestCreated(
@@ -76,6 +81,11 @@ contract QuestController is Ownable, Pausable, EIP712 {
         address indexed worker,
         bytes workCID
     );
+    event FundTransferred(
+        address indexed lancer,
+        address indexed withdrawalAddress,
+        uint256 amount
+    );
 
     error InvalidOrganizationId();
     error Unauthorized();
@@ -92,12 +102,28 @@ contract QuestController is Ownable, Pausable, EIP712 {
     error InvalidNonce();
     error InvalidSignature();
     error DeadlineAlreadyPassed();
+    error FundTransferFailed();
+    error InsufficientBalance();
+    error WorkAlreadySubmitted();
+    error RewardAlreadyGranted();
+    error WorkAlreadyRewarded();
 
-    constructor(OrganizationController _organizationController)
-        EIP712("Quest Controller", "1")
-    {
+    constructor(
+        OrganizationController _organizationController,
+        Credential _credential
+    ) EIP712("Quest Controller", "1") {
         organizationController = _organizationController;
+        credential = _credential;
         signer = msg.sender;
+    }
+
+    modifier verifyProposalAndAdmin(uint256 proposalId) {
+        if (!proposalExists(proposalId)) revert InvalidProposalId();
+        uint256 questId = proposals[proposalId].questId;
+        uint256 orgId = quests[questId].orgId;
+        if (organizationController.adminOf(orgId) != msg.sender)
+            revert Unauthorized();
+        _;
     }
 
     function pause() public onlyOwner {
@@ -204,24 +230,100 @@ contract QuestController is Ownable, Pausable, EIP712 {
         emit ProposalCreated(questId, proposalId, msg.sender, proposalCID);
     }
 
-    function submitWork(uint256 questId, bytes calldata workCID) public {
+    function submitWork(
+        uint256 questId,
+        bytes calldata workCID,
+        bytes calldata signature,
+        uint256 nonce
+    ) public {
+        if (nonceUsed[nonce]) revert InvalidNonce();
         if (!questExists(questId)) revert InvalidQuestId();
         if (statusOfQuest(questId) != QuestStatus.Open) revert QuestNotOpen();
         uint256 proposalId = proposalIds[questId][msg.sender];
         if (proposalId == 0) revert ProposalNotFound();
-        Proposal storage proposal = proposals[proposalId];
+        Proposal memory proposal = proposals[proposalId];
         if (proposal.status != ProposalStatus.Accepted)
             revert ProposalNotAccepted();
+        if (keccak256(proposal.workCID) == keccak256(workCID))
+            revert WorkAlreadySubmitted();
+
+        // verify the signature
+        bytes32 digest = _hashTypedDataV4(
+            keccak256(
+                abi.encode(
+                    keccak256(
+                        "SubmitWork(uint256 questId,address proposer,bytes workCID,uint256 nonce)"
+                    ),
+                    questId,
+                    msg.sender,
+                    keccak256(workCID),
+                    nonce
+                )
+            )
+        );
+        address _signer = digest.recover(signature);
+        if (_signer != signer) revert InvalidSignature();
+        nonceUsed[nonce] = true;
+
         // TODO: check the cid
-        proposal.workCID = workCID;
+        proposals[proposalId].workCID = workCID;
         emit WorkSubmitted(questId, proposalId, msg.sender, workCID);
     }
 
-    function acceptProposal(uint256 proposalId) public {
+    function acceptWork(uint256 proposalId)
+        public
+        verifyProposalAndAdmin(proposalId)
+    {
+        Proposal memory proposal = proposals[proposalId];
+        Quest memory quest = quests[proposal.questId];
+        ProposalStatus oldStatus = proposal.status;
+
+        // check the conditions
+        if (statusOfQuest(proposal.questId) == QuestStatus.Awarded)
+            revert RewardAlreadyGranted();
+        if (proposal.status != ProposalStatus.Accepted)
+            revert ProposalNotAccepted();
+
+        // update the proposal status
+        proposals[proposalId].status = ProposalStatus.Awarded;
+
+        // update the quest status
+        quests[proposal.questId].winnerProposalId = proposalId;
+
+        // increment balance
+        balanceOf[proposal.proposer] += quest.reward;
+
+        // mint credential nft
+        credential.mint(proposal.proposer, proposal.questId, 1, "");
+
+        emit ProposalStatusChanged(
+            proposal.questId,
+            proposalId,
+            oldStatus,
+            ProposalStatus.Awarded
+        );
+    }
+
+    function withdraw(address withdrawalAddress) public {
+        if (balanceOf[msg.sender] == 0) revert InsufficientBalance();
+        uint256 amount = balanceOf[msg.sender];
+        balanceOf[msg.sender] = 0;
+
+        _transferFunds(withdrawalAddress, amount);
+        emit FundTransferred(msg.sender, withdrawalAddress, amount);
+    }
+
+    function acceptProposal(uint256 proposalId)
+        public
+        verifyProposalAndAdmin(proposalId)
+    {
         _changeProposalStatus(proposalId, ProposalStatus.Accepted);
     }
 
-    function rejectProposal(uint256 proposalId) public {
+    function rejectProposal(uint256 proposalId)
+        public
+        verifyProposalAndAdmin(proposalId)
+    {
         _changeProposalStatus(proposalId, ProposalStatus.Rejected);
     }
 
@@ -237,11 +339,9 @@ contract QuestController is Ownable, Pausable, EIP712 {
         private
     {
         // TODO: check if quest is closed first
-        if (!proposalExists(proposalId)) revert InvalidProposalId();
         Proposal memory proposal = proposals[proposalId];
-        uint256 orgId = quests[proposal.questId].orgId;
-        address admin = organizationController.adminOf(orgId);
-        if (admin != msg.sender) revert Unauthorized();
+        if (proposal.status == ProposalStatus.Awarded)
+            revert WorkAlreadyRewarded();
         if (proposal.status == newStatus) revert ProposalAlreadyInSameStatus();
         ProposalStatus oldStatus = proposal.status;
         proposals[proposalId].status = newStatus;
@@ -259,5 +359,10 @@ contract QuestController is Ownable, Pausable, EIP712 {
         if (quest.winnerProposalId != 0) return QuestStatus.Awarded;
         if (quest.deadline < block.timestamp) return QuestStatus.Closed;
         return QuestStatus.Open;
+    }
+
+    function _transferFunds(address receiver, uint256 amount) private {
+        (bool success, ) = receiver.call{value: amount}("");
+        if (!success) revert FundTransferFailed();
     }
 }
