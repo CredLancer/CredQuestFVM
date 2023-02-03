@@ -15,7 +15,7 @@ import { signForProposalCreation } from "../signatures";
 const proposalRouter = Router();
 const prisma = new PrismaClient();
 
-proposalRouter.get(
+proposalRouter.post(
   "/:questId",
   body("description").isLength({ min: 100 }),
   body("approxCompletionTime").isISO8601().toDate(),
@@ -62,11 +62,19 @@ proposalRouter.get(
       description,
       approxCompletionTime,
     };
-    const response = await uploadJSONtoIPFS(jsonObj);
-    const proposalCID = `0x${new CID(response.Hash)
-      .toV1()
-      .toString("base16")
-      .substring(1)}`;
+    const file = await prisma.proposalFile.findFirst({ where: jsonObj });
+    let proposalCID;
+    if (file) proposalCID = file.cid;
+    else {
+      const response = await uploadJSONtoIPFS(jsonObj);
+      proposalCID = `0x${new CID(response.Hash)
+        .toV1()
+        .toString("base16")
+        .substring(1)}`;
+    }
+    await prisma.proposalFile.create({
+      data: { cid: proposalCID, ...jsonObj },
+    });
 
     // create a signature for the proposal
     const nonce = await getNonce();
@@ -102,9 +110,17 @@ proposalRouter.get(
     if (!lancer || !lancer.registered)
       return res.status(400).json({ message: "lancer not registered" });
 
-    const proposals = await prisma.proposal.findMany({
+    let proposals = await prisma.proposal.findMany({
       where: { proposer: address },
     });
+    proposals = await Promise.all(
+      proposals.map(async (proposal) => {
+        const file = await prisma.proposalFile.findUnique({
+          where: { cid: proposal.fileCID },
+        });
+        return { ...file, ...proposal };
+      })
+    );
     res.json({ proposals });
   }
 );
@@ -122,9 +138,17 @@ proposalRouter.get(
     });
     if (!quest) return res.status(404).json({ message: "quest not found" });
 
-    const proposals = await prisma.proposal.findMany({
+    let proposals = await prisma.proposal.findMany({
       where: { questId },
     });
+    proposals = await Promise.all(
+      proposals.map(async (proposal) => {
+        const file = await prisma.proposalFile.findUnique({
+          where: { cid: proposal.fileCID },
+        });
+        return { ...file, ...proposal };
+      })
+    );
     res.json({ proposals });
   }
 );
