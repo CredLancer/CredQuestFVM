@@ -31,7 +31,10 @@ import type {
 export interface QuestControllerInterface extends utils.Interface {
   functions: {
     "acceptProposal(uint256)": FunctionFragment;
+    "acceptWork(uint256)": FunctionFragment;
+    "balanceOf(address)": FunctionFragment;
     "createQuest(bytes,uint256,uint256,uint256,bytes,uint256)": FunctionFragment;
+    "credential()": FunctionFragment;
     "nonceUsed(uint256)": FunctionFragment;
     "organizationController()": FunctionFragment;
     "owner()": FunctionFragment;
@@ -48,17 +51,21 @@ export interface QuestControllerInterface extends utils.Interface {
     "setSigner(address)": FunctionFragment;
     "signer()": FunctionFragment;
     "statusOfQuest(uint256)": FunctionFragment;
-    "submitWork(uint256,bytes)": FunctionFragment;
+    "submitWork(uint256,bytes,bytes,uint256)": FunctionFragment;
     "totalProposals()": FunctionFragment;
     "totalQuests()": FunctionFragment;
     "transferOwnership(address)": FunctionFragment;
     "unpause()": FunctionFragment;
+    "withdraw(address)": FunctionFragment;
   };
 
   getFunction(
     nameOrSignatureOrTopic:
       | "acceptProposal"
+      | "acceptWork"
+      | "balanceOf"
       | "createQuest"
+      | "credential"
       | "nonceUsed"
       | "organizationController"
       | "owner"
@@ -80,11 +87,20 @@ export interface QuestControllerInterface extends utils.Interface {
       | "totalQuests"
       | "transferOwnership"
       | "unpause"
+      | "withdraw"
   ): FunctionFragment;
 
   encodeFunctionData(
     functionFragment: "acceptProposal",
     values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "acceptWork",
+    values: [PromiseOrValue<BigNumberish>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "balanceOf",
+    values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(
     functionFragment: "createQuest",
@@ -96,6 +112,10 @@ export interface QuestControllerInterface extends utils.Interface {
       PromiseOrValue<BytesLike>,
       PromiseOrValue<BigNumberish>
     ]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "credential",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "nonceUsed",
@@ -156,7 +176,12 @@ export interface QuestControllerInterface extends utils.Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "submitWork",
-    values: [PromiseOrValue<BigNumberish>, PromiseOrValue<BytesLike>]
+    values: [
+      PromiseOrValue<BigNumberish>,
+      PromiseOrValue<BytesLike>,
+      PromiseOrValue<BytesLike>,
+      PromiseOrValue<BigNumberish>
+    ]
   ): string;
   encodeFunctionData(
     functionFragment: "totalProposals",
@@ -171,15 +196,22 @@ export interface QuestControllerInterface extends utils.Interface {
     values: [PromiseOrValue<string>]
   ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "withdraw",
+    values: [PromiseOrValue<string>]
+  ): string;
 
   decodeFunctionResult(
     functionFragment: "acceptProposal",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "acceptWork", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "createQuest",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "credential", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "nonceUsed", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "organizationController",
@@ -234,8 +266,10 @@ export interface QuestControllerInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "withdraw", data: BytesLike): Result;
 
   events: {
+    "FundTransferred(address,address,uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "Paused(address)": EventFragment;
     "ProposalCreated(uint256,uint256,address,bytes)": EventFragment;
@@ -245,6 +279,7 @@ export interface QuestControllerInterface extends utils.Interface {
     "WorkSubmitted(uint256,uint256,address,bytes)": EventFragment;
   };
 
+  getEvent(nameOrSignatureOrTopic: "FundTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ProposalCreated"): EventFragment;
@@ -253,6 +288,18 @@ export interface QuestControllerInterface extends utils.Interface {
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "WorkSubmitted"): EventFragment;
 }
+
+export interface FundTransferredEventObject {
+  lancer: string;
+  withdrawalAddress: string;
+  amount: BigNumber;
+}
+export type FundTransferredEvent = TypedEvent<
+  [string, string, BigNumber],
+  FundTransferredEventObject
+>;
+
+export type FundTransferredEventFilter = TypedEventFilter<FundTransferredEvent>;
 
 export interface OwnershipTransferredEventObject {
   previousOwner: string;
@@ -366,6 +413,16 @@ export interface QuestController extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
+    acceptWork(
+      proposalId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
+
+    balanceOf(
+      arg0: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber]>;
+
     createQuest(
       questCID: PromiseOrValue<BytesLike>,
       reward: PromiseOrValue<BigNumberish>,
@@ -375,6 +432,8 @@ export interface QuestController extends BaseContract {
       nonce: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    credential(overrides?: CallOverrides): Promise<[string]>;
 
     nonceUsed(
       arg0: PromiseOrValue<BigNumberish>,
@@ -467,6 +526,8 @@ export interface QuestController extends BaseContract {
     submitWork(
       questId: PromiseOrValue<BigNumberish>,
       workCID: PromiseOrValue<BytesLike>,
+      signature: PromiseOrValue<BytesLike>,
+      nonce: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
 
@@ -482,12 +543,27 @@ export interface QuestController extends BaseContract {
     unpause(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<ContractTransaction>;
+
+    withdraw(
+      withdrawalAddress: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<ContractTransaction>;
   };
 
   acceptProposal(
     proposalId: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  acceptWork(
+    proposalId: PromiseOrValue<BigNumberish>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
+  balanceOf(
+    arg0: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<BigNumber>;
 
   createQuest(
     questCID: PromiseOrValue<BytesLike>,
@@ -498,6 +574,8 @@ export interface QuestController extends BaseContract {
     nonce: PromiseOrValue<BigNumberish>,
     overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
+
+  credential(overrides?: CallOverrides): Promise<string>;
 
   nonceUsed(
     arg0: PromiseOrValue<BigNumberish>,
@@ -588,6 +666,8 @@ export interface QuestController extends BaseContract {
   submitWork(
     questId: PromiseOrValue<BigNumberish>,
     workCID: PromiseOrValue<BytesLike>,
+    signature: PromiseOrValue<BytesLike>,
+    nonce: PromiseOrValue<BigNumberish>,
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
@@ -604,11 +684,26 @@ export interface QuestController extends BaseContract {
     overrides?: Overrides & { from?: PromiseOrValue<string> }
   ): Promise<ContractTransaction>;
 
+  withdraw(
+    withdrawalAddress: PromiseOrValue<string>,
+    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  ): Promise<ContractTransaction>;
+
   callStatic: {
     acceptProposal(
       proposalId: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    acceptWork(
+      proposalId: PromiseOrValue<BigNumberish>,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    balanceOf(
+      arg0: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
     createQuest(
       questCID: PromiseOrValue<BytesLike>,
@@ -619,6 +714,8 @@ export interface QuestController extends BaseContract {
       nonce: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
+
+    credential(overrides?: CallOverrides): Promise<string>;
 
     nonceUsed(
       arg0: PromiseOrValue<BigNumberish>,
@@ -707,6 +804,8 @@ export interface QuestController extends BaseContract {
     submitWork(
       questId: PromiseOrValue<BigNumberish>,
       workCID: PromiseOrValue<BytesLike>,
+      signature: PromiseOrValue<BytesLike>,
+      nonce: PromiseOrValue<BigNumberish>,
       overrides?: CallOverrides
     ): Promise<void>;
 
@@ -720,9 +819,25 @@ export interface QuestController extends BaseContract {
     ): Promise<void>;
 
     unpause(overrides?: CallOverrides): Promise<void>;
+
+    withdraw(
+      withdrawalAddress: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<void>;
   };
 
   filters: {
+    "FundTransferred(address,address,uint256)"(
+      lancer?: PromiseOrValue<string> | null,
+      withdrawalAddress?: PromiseOrValue<string> | null,
+      amount?: null
+    ): FundTransferredEventFilter;
+    FundTransferred(
+      lancer?: PromiseOrValue<string> | null,
+      withdrawalAddress?: PromiseOrValue<string> | null,
+      amount?: null
+    ): FundTransferredEventFilter;
+
     "OwnershipTransferred(address,address)"(
       previousOwner?: PromiseOrValue<string> | null,
       newOwner?: PromiseOrValue<string> | null
@@ -799,6 +914,16 @@ export interface QuestController extends BaseContract {
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
+    acceptWork(
+      proposalId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
+
+    balanceOf(
+      arg0: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
     createQuest(
       questCID: PromiseOrValue<BytesLike>,
       reward: PromiseOrValue<BigNumberish>,
@@ -808,6 +933,8 @@ export interface QuestController extends BaseContract {
       nonce: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
+
+    credential(overrides?: CallOverrides): Promise<BigNumber>;
 
     nonceUsed(
       arg0: PromiseOrValue<BigNumberish>,
@@ -882,6 +1009,8 @@ export interface QuestController extends BaseContract {
     submitWork(
       questId: PromiseOrValue<BigNumberish>,
       workCID: PromiseOrValue<BytesLike>,
+      signature: PromiseOrValue<BytesLike>,
+      nonce: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
@@ -897,12 +1026,27 @@ export interface QuestController extends BaseContract {
     unpause(
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
+
+    withdraw(
+      withdrawalAddress: PromiseOrValue<string>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<BigNumber>;
   };
 
   populateTransaction: {
     acceptProposal(
       proposalId: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    acceptWork(
+      proposalId: PromiseOrValue<BigNumberish>,
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    balanceOf(
+      arg0: PromiseOrValue<string>,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     createQuest(
@@ -914,6 +1058,8 @@ export interface QuestController extends BaseContract {
       nonce: PromiseOrValue<BigNumberish>,
       overrides?: PayableOverrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
+
+    credential(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     nonceUsed(
       arg0: PromiseOrValue<BigNumberish>,
@@ -990,6 +1136,8 @@ export interface QuestController extends BaseContract {
     submitWork(
       questId: PromiseOrValue<BigNumberish>,
       workCID: PromiseOrValue<BytesLike>,
+      signature: PromiseOrValue<BytesLike>,
+      nonce: PromiseOrValue<BigNumberish>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
 
@@ -1003,6 +1151,11 @@ export interface QuestController extends BaseContract {
     ): Promise<PopulatedTransaction>;
 
     unpause(
+      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    ): Promise<PopulatedTransaction>;
+
+    withdraw(
+      withdrawalAddress: PromiseOrValue<string>,
       overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<PopulatedTransaction>;
   };
