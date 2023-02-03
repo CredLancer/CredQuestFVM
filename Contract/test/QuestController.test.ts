@@ -1,4 +1,8 @@
-import { OrganizationController, QuestController } from "../typechain-types";
+import {
+  OrganizationController,
+  QuestController,
+  Credential,
+} from "../typechain-types";
 import { ethers } from "hardhat";
 import { ethers as e, Signer } from "ethers";
 import { expect } from "chai";
@@ -56,7 +60,8 @@ describe("Quest Controller Contract", function () {
   const accounts: string[] = [];
   let wallet: e.Wallet;
   let organizationController: OrganizationController,
-    questController: QuestController;
+    questController: QuestController,
+    credentialContract: Credential;
   let lastNonce = 0;
 
   this.beforeAll(async function () {
@@ -72,9 +77,15 @@ describe("Quest Controller Contract", function () {
     organizationController = await OrganizationController.deploy();
     await organizationController.deployed();
 
+    // deploy the credential contract
+    const Credential = await ethers.getContractFactory("Credential");
+    credentialContract = await Credential.deploy();
+    await credentialContract.deployed();
+
     const QuestController = await ethers.getContractFactory("QuestController");
     questController = await QuestController.deploy(
-      organizationController.address
+      organizationController.address,
+      credentialContract.address
     );
     await questController.deployed();
 
@@ -359,6 +370,54 @@ describe("Quest Controller Contract", function () {
   });
 
   describe("Send Proposal", function () {
-    it("Should not send the proposal if the admin of the organzation", async function () {});
+    it("Should not send the proposal if the sign is invalid", async function () {
+      const nonce = lastNonce;
+      const signature = await wallet._signTypedData(
+        questContractDomain,
+        typesForSendProposal,
+        {
+          questId: "0",
+          proposer: accounts[4],
+          proposalCID:
+            "0x0170122039febd81cc2eddc5bd20afeb13d86e6e511b40468296f10562e4b6c3fe74656b",
+          nonce,
+        }
+      );
+
+      await expect(
+        questController
+          .connect(signers[4])
+          .sendProposal(
+            1,
+            "0x0170122039febd81cc2eddc5bd20afeb13d86e6e511b40468296f10562e4b6c3fe74656b",
+            signature,
+            nonce
+          )
+      ).to.be.revertedWithCustomError(questController, "InvalidSignature");
+    });
+
+    it("Should send the proposal - 1", async function () {
+      const nonce = lastNonce;
+      const signature = await wallet._signTypedData(
+        questContractDomain,
+        typesForSendProposal,
+        {
+          questId: "1",
+          proposer: accounts[4],
+          proposalCID:
+            "0x0170122039febd81cc2eddc5bd20afeb13d86e6e511b40468296f10562e4b6c3fe74656b",
+          nonce,
+        }
+      );
+
+      await questController
+        .connect(signers[4])
+        .sendProposal(
+          1,
+          "0x0170122039febd81cc2eddc5bd20afeb13d86e6e511b40468296f10562e4b6c3fe74656b",
+          signature,
+          nonce
+        );
+    });
   });
 });
