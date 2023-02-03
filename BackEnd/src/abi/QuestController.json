@@ -5,6 +5,11 @@
         "internalType": "contract OrganizationController",
         "name": "_organizationController",
         "type": "address"
+      },
+      {
+        "internalType": "contract Credential",
+        "name": "_credential",
+        "type": "address"
       }
     ],
     "stateMutability": "nonpayable",
@@ -13,6 +18,16 @@
   {
     "inputs": [],
     "name": "DeadlineAlreadyPassed",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "FundTransferFailed",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InsufficientBalance",
     "type": "error"
   },
   {
@@ -82,8 +97,48 @@
   },
   {
     "inputs": [],
+    "name": "RewardAlreadyGranted",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "Unauthorized",
     "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "WorkAlreadyRewarded",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "WorkAlreadySubmitted",
+    "type": "error"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "lancer",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "withdrawalAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "FundTransferred",
+    "type": "event"
   },
   {
     "anonymous": false,
@@ -276,6 +331,38 @@
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "proposalId",
+        "type": "uint256"
+      }
+    ],
+    "name": "acceptWork",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "balanceOf",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "bytes",
         "name": "questCID",
         "type": "bytes"
@@ -309,6 +396,19 @@
     "name": "createQuest",
     "outputs": [],
     "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "credential",
+    "outputs": [
+      {
+        "internalType": "contract Credential",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -630,6 +730,16 @@
         "internalType": "bytes",
         "name": "workCID",
         "type": "bytes"
+      },
+      {
+        "internalType": "bytes",
+        "name": "signature",
+        "type": "bytes"
+      },
+      {
+        "internalType": "uint256",
+        "name": "nonce",
+        "type": "uint256"
       }
     ],
     "name": "submitWork",
@@ -679,6 +789,19 @@
   {
     "inputs": [],
     "name": "unpause",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "withdrawalAddress",
+        "type": "address"
+      }
+    ],
+    "name": "withdraw",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

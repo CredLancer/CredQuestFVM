@@ -12,10 +12,18 @@ const prisma = new PrismaClient();
 
 questRouter.get("/", paginate(12), async (req, res) => {
   const { limit, offset } = req.query;
-  const quests = await prisma.quest.findMany({
+  let quests = await prisma.quest.findMany({
     take: Number(limit),
     skip: Number(offset),
   });
+  quests = await Promise.all(
+    quests.map(async (quest) => {
+      const file = await prisma.questFile.findUnique({
+        where: { cid: quest.questCID },
+      });
+      return { ...file, ...quest };
+    })
+  );
   const totalQuests = await prisma.quest.count();
   res.json({ quests, pages: Math.ceil(totalQuests / Number(limit)) });
 });
@@ -51,11 +59,18 @@ questRouter.post(
 
     const rewardInWei = ethers.BigNumber.from(reward);
     const jsonFile = { title, description };
-    const response = await uploadJSONtoIPFS(jsonFile);
-    const questCID = `0x${new CID(response.Hash)
-      .toV1()
-      .toString("base16")
-      .substring(1)}`;
+    const file = await prisma.questFile.findFirst({ where: jsonFile });
+    let questCID;
+    if (file) questCID = file.cid;
+    else {
+      const response = await uploadJSONtoIPFS(jsonFile);
+      questCID = `0x${new CID(response.Hash)
+        .toV1()
+        .toString("base16")
+        .substring(1)}`;
+    }
+    await prisma.questFile.create({ data: { cid: questCID, ...jsonFile } });
+
     const nonce = await getNonce();
     const signature = await signForQuestCreation({
       orgId,

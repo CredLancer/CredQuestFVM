@@ -2,13 +2,8 @@ import { Lancer, PrismaClient } from "@prisma/client";
 import CID from "cids";
 import { Router } from "express";
 import { body, param } from "express-validator";
-import {
-  generateNonce,
-  getNonceMessage,
-  uploadToIPFS,
-  verifySignature,
-} from "../helpers";
-import { file, validate } from "../middlewares";
+import { generateNonce, getNonceMessage, uploadToIPFS } from "../helpers";
+import { authorizeUser, file, validate } from "../middlewares";
 
 const lancerRouter = Router();
 const prisma = new PrismaClient();
@@ -46,24 +41,10 @@ lancerRouter.post(
   body("email").isEmail(),
   body("description").isString(),
   validate,
+  authorizeUser("address", "signature", true),
   async (req, res) => {
     const { address, signature, name, email, description } = req.body;
     const image = req.file as Express.Multer.File;
-
-    // get the lancer
-    let lancer = await prisma.lancer.findUnique({
-      where: { address: address as string },
-    });
-    if (!lancer)
-      return res.status(400).json({ message: "nonce not generated yet" });
-    if (lancer.registered)
-      return res.status(400).json({ message: "user already registered" });
-
-    // Verify Signature
-    const nonceMessage = getNonceMessage(lancer.nonce);
-    const isSignValid = verifySignature(nonceMessage, signature, address);
-    if (!isSignValid)
-      return res.status(401).json({ message: "invalid signature" });
 
     // upload image
     const response = await uploadToIPFS(image.buffer);
@@ -75,11 +56,11 @@ lancerRouter.post(
     // update the details of the lancer
     await prisma.lancer.update({
       where: { address },
-      data: { description, email, imageCID, name, nonce: generateNonce() },
+      data: { description, email, imageCID, name },
     });
 
     // return the lancer
-    lancer = await prisma.lancer.findUnique({ where: { address } });
+    const lancer = await prisma.lancer.findUnique({ where: { address } });
     res.json({ lancer });
   }
 );
@@ -92,33 +73,18 @@ lancerRouter.put(
   body("email").isEmail().optional({ nullable: true }),
   body("description").isString().optional({ nullable: true }),
   validate,
+  authorizeUser("address", "signature"),
   async (req, res) => {
     const { address, signature, name, email, description } = req.body;
-
-    // get the lancer
-    let lancer = await prisma.lancer.findUnique({
-      where: { address: address as string },
-    });
-    if (!lancer || !lancer.registered)
-      return res.status(400).json({ message: "lancer not registered" });
-
-    if (!name && !email && !description)
-      return res.status(400).json({ message: "nothing parsed to update" });
-
-    // Verify Signature
-    const nonceMessage = getNonceMessage(lancer.nonce);
-    const isSignValid = verifySignature(nonceMessage, signature, address);
-    if (!isSignValid)
-      return res.status(401).json({ message: "invalid signature" });
 
     // update the details of the lancer
     await prisma.lancer.update({
       where: { address },
-      data: { description, email, name, nonce: generateNonce() },
+      data: { description, email, name },
     });
 
     // return the lancer
-    lancer = await prisma.lancer.findUnique({ where: { address } });
+    const lancer = await prisma.lancer.findUnique({ where: { address } });
     res.json({ lancer });
   }
 );
@@ -129,22 +95,10 @@ lancerRouter.put(
   param("address").isEthereumAddress(),
   body("signature").isString(),
   validate,
+  authorizeUser("address", "signature"),
   async (req, res) => {
     const { address, signature } = req.body;
     const image = req.file as Express.Multer.File;
-
-    // get the lancer
-    let lancer = await prisma.lancer.findUnique({
-      where: { address: address as string },
-    });
-    if (!lancer || !lancer.registered)
-      return res.status(400).json({ message: "lancer not registered" });
-
-    // Verify Signature
-    const nonceMessage = getNonceMessage(lancer.nonce);
-    const isSignValid = verifySignature(nonceMessage, signature, address);
-    if (!isSignValid)
-      return res.status(401).json({ message: "invalid signature" });
 
     // upload image
     const response = await uploadToIPFS(image.buffer);
@@ -156,11 +110,11 @@ lancerRouter.put(
     // update the details of the lancer
     await prisma.lancer.update({
       where: { address },
-      data: { imageCID, nonce: generateNonce() },
+      data: { imageCID },
     });
 
     // return the lancer
-    lancer = await prisma.lancer.findUnique({ where: { address } });
+    const lancer = await prisma.lancer.findUnique({ where: { address } });
     res.json({ lancer });
   }
 );

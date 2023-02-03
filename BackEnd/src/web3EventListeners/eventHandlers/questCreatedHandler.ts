@@ -20,8 +20,8 @@ export default async function questCreatedHandler(
     data: {
       id: questId.toString(),
       questCID,
-      value: Number(reward),
-      deadline: new Date(Number(deadline) * 1000).toString(),
+      value: reward.toString(),
+      deadline: new Date(Number(deadline) * 1000).toISOString(),
       blockNumber,
       org: { connect: { id: organizationId.toString() } },
     },
