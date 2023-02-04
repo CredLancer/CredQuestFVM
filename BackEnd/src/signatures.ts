@@ -94,3 +94,25 @@ export async function signForProposalCreation(data: {
     data
   );
 }
+
+export async function signForWorkSubmission(data: {
+  questId: string;
+  proposer: string;
+  workCID: string;
+  nonce: string;
+}) {
+  const types = {
+    SubmitWork: [
+      { name: "questId", type: "uint256" },
+      { name: "proposer", type: "address" },
+      { name: "workCID", type: "bytes" },
+      { name: "nonce", type: "uint256" },
+    ],
+  };
+
+  return await signer._signTypedData(
+    await getQuestContractDomain(),
+    types,
+    data
+  );
+}
