@@ -109,6 +109,20 @@ model Proposal {
   quest       Quest          @relation(fields: [questId], references: [id])
 
   ProposalStatusChange ProposalStatusChange[]
+  WorkSubmission       WorkSubmission[]
+}
+
+model WorkSubmission {
+  transactionHash  String
+  blockNumber      Int
+  transactionIndex Int
+  logIndex         Int
+  cid              String
+  proposalId       String
+
+  proposal Proposal @relation(fields: [proposalId], references: [id])
+
+  @@id([transactionHash, blockNumber, transactionIndex, logIndex])
 }
 
 model ProposalStatusChange {
