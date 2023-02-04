@@ -71,10 +71,10 @@ proposalRouter.post(
         .toV1()
         .toString("base16")
         .substring(1)}`;
+      await prisma.proposalFile.create({
+        data: { cid: proposalCID, ...jsonObj },
+      });
     }
-    await prisma.proposalFile.create({
-      data: { cid: proposalCID, ...jsonObj },
-    });
 
     // create a signature for the proposal
     const nonce = await getNonce();

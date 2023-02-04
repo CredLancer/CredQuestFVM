@@ -5,6 +5,7 @@ import { Router } from "express";
 import { body } from "express-validator";
 import { getNonce, uploadJSONtoIPFS } from "../helpers";
 import { paginate, validate } from "../middlewares";
+import { getSkills } from "../openai";
 import { signForQuestCreation } from "../signatures";
 
 const questRouter = Router();
@@ -63,13 +64,15 @@ questRouter.post(
     let questCID;
     if (file) questCID = file.cid;
     else {
+      const skills = await getSkills(description);
+      (jsonFile as any).skills = skills;
       const response = await uploadJSONtoIPFS(jsonFile);
       questCID = `0x${new CID(response.Hash)
         .toV1()
         .toString("base16")
         .substring(1)}`;
+      await prisma.questFile.create({ data: { cid: questCID, ...jsonFile } });
     }
-    await prisma.questFile.create({ data: { cid: questCID, ...jsonFile } });
 
     const nonce = await getNonce();
     const signature = await signForQuestCreation({
