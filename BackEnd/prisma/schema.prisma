@@ -93,7 +93,8 @@ model Quest {
   blockNumber Int
   org         Organization @relation(fields: [orgId], references: [id])
 
-  Proposal Proposal[]
+  Proposal   Proposal[]
+  Credential Credential[]
 }
 
 model Proposal {
@@ -102,6 +103,7 @@ model Proposal {
   blockNumber Int
   description String?
   fileCID     String
+  workCID     String?
   status      ProposalStatus @default(Proposed)
   questId     String
   quest       Quest          @relation(fields: [questId], references: [id])
@@ -130,4 +132,20 @@ model Lancer {
   name        String?
   description String?
   registered  Boolean @default(false)
+
+  Credential Credential[]
+}
+
+model Credential {
+  id               String @id
+  holderAddress    String
+  transactionHash  String
+  blockNumber      Int
+  transactionIndex Int
+  logIndex         Int
+
+  holder Lancer @relation(fields: [holderAddress], references: [address])
+  quest  Quest  @relation(fields: [id], references: [id])
+
+  @@unique([transactionHash, blockNumber, transactionIndex, logIndex])
 }
