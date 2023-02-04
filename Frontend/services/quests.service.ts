@@ -20,8 +20,8 @@ export class QuestService {
   }
 
   static async fetchQuestByCID(cid: string) {
-    return fetch(`${LIGHTHOUSE_URL}/f${cid}`, {
+    return fetch(`${LIGHTHOUSE_URL}${cid.substring(2)}`, {
       method: "GET",
-    });
+    }).then((res) => res.json());
   }
 }

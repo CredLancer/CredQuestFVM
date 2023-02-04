@@ -8,9 +8,12 @@ import {
   List,
   ListItem,
   Spinner,
+  Grid,
+  GridItem,
 } from "@chakra-ui/react";
 import { useQuery } from "react-query";
 import { QuestService } from "../../services";
+import { ViewSingleQuest } from "../utils";
 
 export const ListQuestsView = () => {
   const { data, isLoading } = useQuery(
@@ -25,36 +28,18 @@ export const ListQuestsView = () => {
       <Spinner size="md" />
     </Flex>
   ) : (
-    <List mt="10">
+    <Grid mt="10" gap="6" gridTemplateColumns="1fr 1fr">
       {data?.quests?.length ? (
-        <ListItem>
-          <Flex alignItems="stretch" justifyContent="flex-start" gap="8">
-            <Box>
-              <SkeletonCircle size="28" />
-            </Box>
-
-            <Box flex="1">
-              <Text fontWeight="bold">John Doe</Text>
-              <Text mt="3">
-                Creating in-game graphics, audio engineering and VR
-              </Text>
-            </Box>
-
-            <VStack>
-              <Button colorScheme="pink" w="100%">
-                Update
-              </Button>
-              <Button colorScheme="whiteAlpha" w="100%">
-                View
-              </Button>
-            </VStack>
-          </Flex>
-        </ListItem>
+        data.quests.map((quest: any) => (
+          <GridItem colSpan={1} key={quest.id}>
+            <ViewSingleQuest {...quest} />
+          </GridItem>
+        ))
       ) : (
         <Text size="20" fontWeight="bold" textAlign="center" color="red">
           There are no Quests to display!
         </Text>
       )}
-    </List>
+    </Grid>
   );
 };

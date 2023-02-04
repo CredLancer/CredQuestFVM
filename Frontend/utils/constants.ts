@@ -1,7 +1,7 @@
 export const BASE_URL =
   process.env.NEXT_API_BASE_URL ?? "http://localhost:8000";
 
-export const LIGHTHOUSE_URL = "https://gateway.lighthouse.storage/ipfs";
+export const LIGHTHOUSE_URL = "https://gateway.lighthouse.storage/ipfs/f";
 
 /// CONTRACT CONSTANTS
 export const ORGANIZATION_CONTRACT =

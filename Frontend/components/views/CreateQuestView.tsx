@@ -8,6 +8,7 @@ import {
   Input,
   Textarea,
   Spinner,
+  Box,
 } from "@chakra-ui/react";
 import {
   useAccount,
@@ -88,7 +89,7 @@ export const CreateQuestView = () => {
   console.log({ error, organization, isSuccess });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <Box as="form" onSubmit={handleSubmit(onSubmit)}>
       <Heading textAlign="center" as="h3" mb="10">
         Fill form to create Quest
       </Heading>
@@ -207,6 +208,6 @@ export const CreateQuestView = () => {
           </Button>
         </GridItem>
       </Grid>
-    </form>
+    </Box>
   );
 };
