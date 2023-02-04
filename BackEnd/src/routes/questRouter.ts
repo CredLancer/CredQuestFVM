@@ -3,7 +3,7 @@ import CID from "cids";
 import { ethers } from "ethers";
 import { Router } from "express";
 import { body } from "express-validator";
-import { getNonce, uploadJSONtoIPFS } from "../helpers";
+import { findOrCreateSkills, getNonce, uploadJSONtoIPFS } from "../helpers";
 import { paginate, validate } from "../middlewares";
 import { getSkills } from "../openai";
 import { signForQuestCreation } from "../signatures";
@@ -94,7 +94,17 @@ questRouter.post(
         .toV1()
         .toString("base16")
         .substring(1)}`;
-      await prisma.questFile.create({ data: { cid: questCID, ...jsonFile } });
+      await findOrCreateSkills(skills);
+      await prisma.questFile.create({
+        data: {
+          cid: questCID,
+          skills: {
+            connect: (skills as string[]).map((skill) => ({ title: skill })),
+          },
+          title,
+          description,
+        },
+      });
     }
 
     const nonce = await getNonce();

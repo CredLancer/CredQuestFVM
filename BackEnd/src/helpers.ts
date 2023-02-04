@@ -71,3 +71,12 @@ export async function uploadJSONtoIPFS(obj: any) {
   );
   return res.data;
 }
+
+export async function findOrCreateSkills(skills: string[]) {
+  for (const skill of skills) {
+    let skillObj = await prisma.skill.findUnique({ where: { title: skill } });
+    if (!skillObj) {
+      skillObj = await prisma.skill.create({ data: { title: skill } });
+    }
+  }
+}
