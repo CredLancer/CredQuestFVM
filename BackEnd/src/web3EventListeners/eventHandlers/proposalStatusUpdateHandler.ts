@@ -7,6 +7,7 @@ const proposalStatusFromProposalStatusId = [
   ProposalStatus.Proposed,
   ProposalStatus.Accepted,
   ProposalStatus.Rejected,
+  ProposalStatus.Awarded,
 ];
 
 export default async function proposalStatusUpdateHandler(
@@ -47,17 +48,19 @@ export default async function proposalStatusUpdateHandler(
     ],
   });
   if (
-    !lastProposalStatusUpdate ||
-    blockNumber > lastProposalStatusUpdate.blockNumber ||
-    (blockNumber == lastProposalStatusUpdate.blockNumber &&
-      (transactionIndex > lastProposalStatusUpdate.transactionIndex ||
-        (transactionIndex == lastProposalStatusUpdate.transactionIndex &&
-          logIndex > lastProposalStatusUpdate.logIndex)))
+    proposal.status != ProposalStatus.Awarded &&
+    (!lastProposalStatusUpdate ||
+      blockNumber > lastProposalStatusUpdate.blockNumber ||
+      (blockNumber == lastProposalStatusUpdate.blockNumber &&
+        (transactionIndex > lastProposalStatusUpdate.transactionIndex ||
+          (transactionIndex == lastProposalStatusUpdate.transactionIndex &&
+            logIndex > lastProposalStatusUpdate.logIndex))))
   )
     await prisma.proposal.update({
       where: { id: proposalId.toString() },
       data: { status: proposalStatusFromProposalStatusId[newStatus] },
     });
+
   proposalStatusUpdate = await prisma.proposalStatusChange.create({
     data: {
       transactionHash,

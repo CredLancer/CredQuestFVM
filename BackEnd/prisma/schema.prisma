@@ -69,12 +69,19 @@ enum ProposalStatus {
   Proposed
   Accepted
   Rejected
+  Awarded
+}
+
+model Skill {
+  title      String      @id
+  QuestFiles QuestFile[]
 }
 
 model QuestFile {
-  cid         String @id
+  cid         String  @id
   title       String
   description String
+  skills      Skill[]
 }
 
 model ProposalFile {
@@ -93,7 +100,8 @@ model Quest {
   blockNumber Int
   org         Organization @relation(fields: [orgId], references: [id])
 
-  Proposal Proposal[]
+  Proposal   Proposal[]
+  Credential Credential[]
 }
 
 model Proposal {
@@ -102,11 +110,26 @@ model Proposal {
   blockNumber Int
   description String?
   fileCID     String
+  workCID     String?
   status      ProposalStatus @default(Proposed)
   questId     String
   quest       Quest          @relation(fields: [questId], references: [id])
 
   ProposalStatusChange ProposalStatusChange[]
+  WorkSubmission       WorkSubmission[]
+}
+
+model WorkSubmission {
+  transactionHash  String
+  blockNumber      Int
+  transactionIndex Int
+  logIndex         Int
+  cid              String
+  proposalId       String
+
+  proposal Proposal @relation(fields: [proposalId], references: [id])
+
+  @@id([transactionHash, blockNumber, transactionIndex, logIndex])
 }
 
 model ProposalStatusChange {
@@ -130,4 +153,20 @@ model Lancer {
   name        String?
   description String?
   registered  Boolean @default(false)
+
+  Credential Credential[]
+}
+
+model Credential {
+  id               String @id
+  holderAddress    String
+  transactionHash  String
+  blockNumber      Int
+  transactionIndex Int
+  logIndex         Int
+
+  holder Lancer @relation(fields: [holderAddress], references: [address])
+  quest  Quest  @relation(fields: [id], references: [id])
+
+  @@unique([transactionHash, blockNumber, transactionIndex, logIndex])
 }

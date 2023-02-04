@@ -5,6 +5,7 @@ import { Router } from "express";
 import { body } from "express-validator";
 import { getNonce, uploadJSONtoIPFS } from "../helpers";
 import { paginate, validate } from "../middlewares";
+import { getSkills } from "../openai";
 import { signForQuestCreation } from "../signatures";
 
 const questRouter = Router();
@@ -35,6 +36,29 @@ questRouter.get("/:id", async (req, res) => {
   res.json({ quest });
 });
 
+questRouter.get("/organizationId/:id", paginate(12), async (req, res) => {
+  const { id } = req.params;
+  const { limit, offset } = req.query;
+  const organization = await prisma.organization.findUnique({ where: { id } });
+  if (!organization)
+    return res.status(400).json({ message: "organization not found" });
+  let quests = await prisma.quest.findMany({
+    where: { orgId: id },
+    take: Number(limit),
+    skip: Number(offset),
+  });
+  quests = await Promise.all(
+    quests.map(async (quest) => {
+      const file = await prisma.questFile.findUnique({
+        where: { cid: quest.questCID },
+      });
+      return { ...file, ...quest };
+    })
+  );
+  const totalQuests = await prisma.quest.count();
+  res.json({ quests, pages: Math.ceil(totalQuests / Number(limit)) });
+});
+
 questRouter.post(
   "/",
   body("orgId").isNumeric(),
@@ -63,13 +87,15 @@ questRouter.post(
     let questCID;
     if (file) questCID = file.cid;
     else {
+      const skills = await getSkills(description);
+      (jsonFile as any).skills = skills;
       const response = await uploadJSONtoIPFS(jsonFile);
       questCID = `0x${new CID(response.Hash)
         .toV1()
         .toString("base16")
         .substring(1)}`;
+      await prisma.questFile.create({ data: { cid: questCID, ...jsonFile } });
     }
-    await prisma.questFile.create({ data: { cid: questCID, ...jsonFile } });
 
     const nonce = await getNonce();
     const signature = await signForQuestCreation({

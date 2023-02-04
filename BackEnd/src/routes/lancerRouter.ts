@@ -17,6 +17,7 @@ lancerRouter.get(
 
     const lancer = (await prisma.lancer.findUnique({
       where: { address: address as string },
+      include: { Credential: true },
     })) as Lancer;
     if (lancer) {
       if (lancer.registered) return res.json({ lancer, registered: true });
@@ -60,7 +61,10 @@ lancerRouter.post(
     });
 
     // return the lancer
-    const lancer = await prisma.lancer.findUnique({ where: { address } });
+    const lancer = await prisma.lancer.findUnique({
+      where: { address },
+      include: { Credential: true },
+    });
     res.json({ lancer });
   }
 );
@@ -84,7 +88,10 @@ lancerRouter.put(
     });
 
     // return the lancer
-    const lancer = await prisma.lancer.findUnique({ where: { address } });
+    const lancer = await prisma.lancer.findUnique({
+      where: { address },
+      include: { Credential: true },
+    });
     res.json({ lancer });
   }
 );
@@ -114,7 +121,10 @@ lancerRouter.put(
     });
 
     // return the lancer
-    const lancer = await prisma.lancer.findUnique({ where: { address } });
+    const lancer = await prisma.lancer.findUnique({
+      where: { address },
+      include: { Credential: true },
+    });
     res.json({ lancer });
   }
 );
