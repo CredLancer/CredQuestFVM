@@ -36,6 +36,29 @@ questRouter.get("/:id", async (req, res) => {
   res.json({ quest });
 });
 
+questRouter.get("/organizationId/:id", paginate(12), async (req, res) => {
+  const { id } = req.params;
+  const { limit, offset } = req.query;
+  const organization = await prisma.organization.findUnique({ where: { id } });
+  if (!organization)
+    return res.status(400).json({ message: "organization not found" });
+  let quests = await prisma.quest.findMany({
+    where: { orgId: id },
+    take: Number(limit),
+    skip: Number(offset),
+  });
+  quests = await Promise.all(
+    quests.map(async (quest) => {
+      const file = await prisma.questFile.findUnique({
+        where: { cid: quest.questCID },
+      });
+      return { ...file, ...quest };
+    })
+  );
+  const totalQuests = await prisma.quest.count();
+  res.json({ quests, pages: Math.ceil(totalQuests / Number(limit)) });
+});
+
 questRouter.post(
   "/",
   body("orgId").isNumeric(),
