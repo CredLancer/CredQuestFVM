@@ -25,10 +25,10 @@ const Dashboard: NextPage = () => {
   const { isConnected } = useAccount();
   const router = useRouter();
 
-  if (!isConnected) {
-    router.push("");
-    return null;
-  }
+  // if (!isConnected) {
+  //   router.push("");
+  //   return null;
+  // }
 
   return (
     <Box bgGradient="linear(#9C1EF3 0%, #9C1EF3 25%, #29116c 75%, )" minH="3xl">

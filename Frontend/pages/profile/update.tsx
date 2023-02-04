@@ -1,15 +1,11 @@
 import {
   Box,
   Button,
-  Container,
   Flex,
   Grid,
   GridItem,
   Heading,
   Text,
-  Link,
-  SkeletonCircle,
-  HStack,
   VStack,
   Square,
   Input,
@@ -24,18 +20,12 @@ import ORGANIZATION_ABI from "../../assets/contracts/OrganizationController.json
 import {
   useAccount,
   useContract,
-  useContractWrite,
-  usePrepareContractWrite,
-  useProvider,
-  useSendTransaction,
   useSigner,
   useWebSocketProvider,
 } from "wagmi";
-import { BigNumber } from "@ethersproject/bignumber";
-import { ChangeEvent, useMemo, useState } from "react";
-import { useRouter } from "next/router";
+import { ChangeEvent, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation } from "react-query";
+import { useMutation, useQuery } from "react-query";
 import { OrganizationService } from "../../services/organization.service";
 import Image from "next/image";
 import { ORGANIZATION_CONTRACT } from "../../utils/constants";
@@ -56,12 +46,21 @@ const UserProfile: NextPage = () => {
     abi: ORGANIZATION_ABI,
     signerOrProvider: signer,
   });
-  const {
-    mutate,
-    data: profile_data,
-    isLoading: isSubmitting,
-  } = useMutation(OrganizationService.createOrganizationProfile);
-  const { handleSubmit, register, setValue } = useForm();
+  const { data: organization, isLoading } = useQuery(
+    ["organization.address", address],
+    () => OrganizationService.findOrganizationByAddress(`${address}`),
+    { enabled: !!address, retry: 2 }
+  );
+  const { mutate, isLoading: isSubmitting } = useMutation(
+    OrganizationService.createOrganizationProfile
+  );
+  const { handleSubmit, register, setValue } = useForm({
+    defaultValues: {
+      org_name: organization?.org?.name,
+      email: organization?.org?.email ?? "",
+      org_description: organization?.org?.description ?? "",
+    } as any,
+  });
   const [uploadedLogo, setUploadedLogo] = useState<LogoInfo>();
 
   const onSubmit = (model: any) => {
@@ -83,7 +82,7 @@ const UserProfile: NextPage = () => {
         console.log({ response });
         const { name, imageCID, signature, nonce } = response;
         contract?.createOrganization(name, imageCID, signature, nonce, {
-          maxPriorityFeePerGas: await (provider as any)?.send(
+          maxPriorityFeePerGas: await provider?.send(
             "eth_maxPriorityFeePerGas",
             []
           ),
@@ -91,8 +90,6 @@ const UserProfile: NextPage = () => {
       },
     });
   };
-
-  console.log({ provider, signer });
 
   const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -113,11 +110,15 @@ const UserProfile: NextPage = () => {
     }
   };
 
-  return (
+  return isLoading ? (
+    <Box>
+      <Spinner size="lg" />
+    </Box>
+  ) : (
     <InternalNavigationPage
       heading={
         <Heading color="black" fontSize="large" as="h4">
-          Update Profile
+          {organization ? "Update Profile" : "Create Profile"}
         </Heading>
       }
     >

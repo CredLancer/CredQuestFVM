@@ -8,6 +8,7 @@ import { Page } from "../components/Page";
 import { Web3Provider } from "../providers/Web3";
 import { ChakraProvider } from "../providers/Chakra";
 import QueryClientProvider from "../providers/Query";
+import { QuestContext } from "../providers/Quest";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const isMounted = useIsMounted();
@@ -17,9 +18,11 @@ function MyApp({ Component, pageProps }: AppProps) {
       <QueryClientProvider>
         <ChakraProvider>
           {isMounted && (
-            <Page>
-              <Component {...pageProps} />
-            </Page>
+            <QuestContext>
+              <Page>
+                <Component {...pageProps} />
+              </Page>
+            </QuestContext>
           )}
         </ChakraProvider>
       </QueryClientProvider>

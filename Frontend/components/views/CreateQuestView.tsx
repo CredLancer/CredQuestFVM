@@ -23,9 +23,15 @@ import { OrganizationService, QuestService } from "../../services";
 import { QUEST_CONTRACT } from "../../utils/constants";
 import QUEST_ABI from "../../assets/contracts/QuestController.json";
 import { BigNumber } from "ethers";
-import { parseEther } from "ethers/lib/utils.js";
+import { formatEther, parseEther, parseUnits } from "ethers/lib/utils.js";
+import { useQuestContext } from "../../providers/Quest";
+
+interface ComponentProps {
+  isUpdating?: any;
+}
 
 export const CreateQuestView = () => {
+  const { selectedQuest } = useQuestContext()!;
   const { address } = useAccount();
   const { data: signer } = useSigner();
   const provider = useWebSocketProvider();
@@ -34,11 +40,30 @@ export const CreateQuestView = () => {
     abi: QUEST_ABI,
     signerOrProvider: signer,
   });
-  const { handleSubmit, register } = useForm();
+  const { handleSubmit, register } = useForm({
+    defaultValues: {
+      title: selectedQuest?.title ?? "",
+      hoursRequired: 100,
+      reward: formatEther((selectedQuest?.value ?? "0").toString()),
+      description: selectedQuest?.description,
+    } as any,
+  });
   const { data: organization, isLoading } = useQuery(
     ["organization.address", address],
     () => OrganizationService.findOrganizationByAddress(`${address}`)
   );
+  // console.log({
+  //   deadline: (selectedQuest?.deadline as any as Date)?.toDateString(),
+  // });
+
+  console.log({ selectedQuest });
+  console.log({
+    deadline: new Date(selectedQuest?.deadline ?? "")
+      .toLocaleDateString()
+      .split("/")
+      .reverse()
+      .join("/"),
+  });
 
   const {
     mutate,
@@ -144,19 +169,6 @@ export const CreateQuestView = () => {
               id="credentials"
               color="black.5"
               {...register("credentials")}
-            />
-          </FormControl>
-        </GridItem>
-        <GridItem colSpan={4}>
-          <FormControl>
-            <FormLabel htmlFor="skills">Skill Requirement</FormLabel>
-            <Input
-              bg="white.2"
-              borderRadius="2px"
-              id="skills"
-              type="text"
-              color="black.5"
-              {...register("skills")}
             />
           </FormControl>
         </GridItem>

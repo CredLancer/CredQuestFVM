@@ -12,17 +12,19 @@ import {
   GridItem,
 } from "@chakra-ui/react";
 import { useQuery } from "react-query";
+import { useQuestContext } from "../../providers/Quest";
 import { QuestService } from "../../services";
+import { QuestResponse } from "../../utils/models";
 import { ViewSingleQuest } from "../utils";
 
-export const ListQuestsView = (lancer: number) => {
+export const ListQuestsView = () => {
+  const { updateSelectedQuest } = useQuestContext()!;
   const { data, isLoading } = useQuery(
     "quests",
     () => QuestService.fetchQuests(),
-    { retry: 2 }
+    { retry: 2, onSuccess: () => updateSelectedQuest(undefined) }
   );
 
-  console.log({ data });
   return isLoading ? (
     <Flex alignItems="center" justifyContent="center">
       <Spinner size="md" />

@@ -8,33 +8,42 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useQuery } from "react-query";
-import { QuestService } from "../../services";
+import { QuestResponse } from "../../utils/models";
+import { QuestService, OrganizationService } from "../../services";
+import { useAccount } from "wagmi";
+import { useQuestContext } from "../../providers/Quest";
+import { useRouter } from "next/router";
 
-interface ComponentProps {
-  title: string;
-  description: string;
-  id: number;
-  questCID: string;
-  status: string;
-  orgId: number;
-  value: number;
-  blockNumber?: number;
-  deadline?: number;
+interface ComponentProps extends QuestResponse {
+  handleUpdate: (quest?: QuestResponse) => void;
 }
 
-export const ViewSingleQuest: React.FC<ComponentProps> = ({ questCID, id }) => {
+export const ViewSingleQuest: React.FC<QuestResponse> = ({ ...quest }) => {
+  const { updateSelectedQuest, updateEditQuestStatus } = useQuestContext()!;
+  const router = useRouter();
+  const { address } = useAccount();
+  const { questCID, id, orgId } = quest;
   const { data, isLoading } = useQuery([`Quest-${id}`, questCID], () =>
     QuestService.fetchQuestByCID(questCID)
   );
-
-  console.log({ data });
+  const { data: organization } = useQuery(
+    ["organization.address", address],
+    () => OrganizationService.findOrganizationByAddress(`${address}`)
+  );
+  const initiateQuestUpdate = () => {
+    updateSelectedQuest(quest);
+    updateEditQuestStatus(true);
+    router.push("/quests?tab=1");
+  };
 
   return isLoading ? (
     <Spinner />
   ) : (
     <Flex alignItems="stretch" justifyContent="flex-start" gap="4">
       <Box>
-        <SkeletonCircle size="20" />
+        <SkeletonCircle size="20" isLoaded={!!organization}>
+          <Text>{organization?.org.name}</Text>
+        </SkeletonCircle>
       </Box>
 
       <Box
@@ -54,7 +63,7 @@ export const ViewSingleQuest: React.FC<ComponentProps> = ({ questCID, id }) => {
       <VStack>
 
         <Button
-          onClick={() => console.log({ questCID })}
+          onClick={() => initiateQuestUpdate()}
           colorScheme="pink"
           w="100%"
         >

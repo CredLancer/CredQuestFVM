@@ -1,50 +1,15 @@
-import {
-  Box,
-  Button,
-  Container,
-  Flex,
-  Grid,
-  GridItem,
-  Heading,
-  Text,
-  Link,
-  SkeletonCircle,
-  HStack,
-  VStack,
-  FormControl,
-  FormLabel,
-  Input,
-  Textarea,
-  List,
-  ListItem,
-  Accordion,
-  AccordionButton,
-  AccordionIcon,
-  AccordionItem,
-  AccordionPanel,
-  Tab,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-} from "@chakra-ui/react";
+import { Box, Tab, TabList, TabPanel, TabPanels, Tabs } from "@chakra-ui/react";
 import type { NextPage } from "next";
-import Head from "next/head";
-import styles from "../styles/Home.module.css";
-import { useAccount, useSendTransaction } from "wagmi";
-import { BigNumber } from "@ethersproject/bignumber";
-import { useState } from "react";
-import { SelectRoleModal } from "../../components/Modals/SelectRole";
+import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
-import { QuestDisplayPage } from "../../components/Page/QuestDisplay";
-import { useForm } from "react-hook-form";
-import { CheckCircleIcon } from "@chakra-ui/icons";
 import { DashboardLayout } from "../../components/Page/DashboardLayout";
 import { CreateQuestView, ListQuestsView } from "../../components/views";
-import { QuestService } from "../../services";
-import { useQuery } from "react-query";
+import { useState } from "react";
+import { QuestResponse } from "../../utils/models";
+import { useQuestContext } from "../../providers/Quest";
 
 const ViewQuests: NextPage = () => {
+  const { editingQuest, updateEditQuestStatus } = useQuestContext()!;
   const { isConnected } = useAccount();
   const router = useRouter();
   const tab = router.query.tab as string;
@@ -66,7 +31,9 @@ const ViewQuests: NextPage = () => {
       <Tabs
         variant="unstyled"
         colorScheme="cyan"
+        index={editingQuest ? 1 : undefined}
         defaultIndex={Number(tab) || 0}
+        onChange={(tab) => updateEditQuestStatus(undefined)}
         isLazy
       >
         <TabList color="#321975" border="5px solid rgba(69, 76, 115, 0.88)">
