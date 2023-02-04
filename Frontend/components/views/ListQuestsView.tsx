@@ -15,7 +15,7 @@ import { useQuery } from "react-query";
 import { QuestService } from "../../services";
 import { ViewSingleQuest } from "../utils";
 
-export const ListQuestsView = () => {
+export const ListQuestsView = (lancer: number) => {
   const { data, isLoading } = useQuery(
     "quests",
     () => QuestService.fetchQuests(),
@@ -31,6 +31,7 @@ export const ListQuestsView = () => {
     <Grid mt="10" gap="6" gridTemplateColumns="1fr 1fr">
       {data?.quests?.length ? (
         data.quests.map((quest: any) => (
+          
           <GridItem colSpan={1} key={quest.id}>
             <ViewSingleQuest {...quest} />
           </GridItem>

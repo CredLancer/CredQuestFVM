@@ -20,7 +20,7 @@ import {
     Spinner,
   } from "@chakra-ui/react";
 
-  import { ListQuestsView } from "../../components/views";
+  import { ListLancerQuestsView } from "../../components/views";
 
   import type { NextPage } from "next";
   import ORGANIZATION_ABI from "../../assets/contracts/OrganizationController.json";
@@ -57,7 +57,7 @@ import {
   };
   
   const LancerQuests: NextPage = () => {
-  
+
     return (
       <InternalNavigationPage
         heading={
@@ -69,7 +69,8 @@ import {
         <Heading as="h4" textAlign={`center`}>
           Available Quests
         </Heading>
-        <ListQuestsView />
+        
+        <ListLancerQuestsView />
 
       </InternalNavigationPage>
     );

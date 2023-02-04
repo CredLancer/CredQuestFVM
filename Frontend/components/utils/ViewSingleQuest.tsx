@@ -52,6 +52,7 @@ export const ViewSingleQuest: React.FC<ComponentProps> = ({ questCID, id }) => {
       </Box>
 
       <VStack>
+
         <Button
           onClick={() => console.log({ questCID })}
           colorScheme="pink"
@@ -59,6 +60,7 @@ export const ViewSingleQuest: React.FC<ComponentProps> = ({ questCID, id }) => {
         >
           Update
         </Button>
+        
         <Button onClick={() => console.log({ id })} colorScheme="teal" w="100%">
           View
         </Button>
