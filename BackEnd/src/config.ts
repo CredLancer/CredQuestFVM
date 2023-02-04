@@ -11,6 +11,7 @@ export const QUEST_CONTROLLER_ADDRESS =
 export const CREDENTIAL_CONTROLLER_ADDRESS =
   process.env.CREDENTIAL_CONTROLLER_ADDRESS || "";
 export const WEB3_RPC_URI = process.env.WEB3_RPC_URI || "";
+export const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 export const SIGNER_PRIVATE_KEY = process.env.SIGNER_PRIVATE_KEY || "";
 export const LIGHTHOUSE_API_KEY = process.env.LIGHTHOUSE_API_KEY || "";
 export const CHAIN_ID = 3141;
