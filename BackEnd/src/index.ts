@@ -7,6 +7,7 @@ import organizationRouter from "./routes/organizationRouter";
 import questRouter from "./routes/questRouter";
 import lancerRouter from "./routes/lancerRouter";
 import proposalRouter from "./routes/proposalRouter";
+import workRouter from "./routes/workRouter";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use("/organization", organizationRouter);
 app.use("/quest", questRouter);
 app.use("/lancer", lancerRouter);
 app.use("/proposal", proposalRouter);
+app.use("/work", workRouter);
 
 web3EventListeners();
 
