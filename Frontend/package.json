@@ -17,6 +17,7 @@
     "@emotion/styled": "^11.10.5",
     "@heroicons/react": "^2.0.13",
     "@rainbow-me/rainbowkit": "^0.8.1",
+    "@rainbow-me/rainbowkit-siwe-next-auth": "^0.1.5",
     "@svgr/webpack": "^6.5.1",
     "ethers": "^5.0.0",
     "framer-motion": "^8.5.0",
