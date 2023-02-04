@@ -44,6 +44,16 @@ export const Page: FC<{ children?: React.ReactNode }> = ({ children }) => {
                   </Button>
                 )}
 
+                {isConnected && (
+                  <Button
+                    colorScheme="blue"
+                    onClick={() => router.push("/lancer/update")}
+                  >
+                    Lancer Profile
+                  </Button>
+                )}
+
+
                 <ConnectButton label="Join Us" />
               </Flex>
             </HStack>
