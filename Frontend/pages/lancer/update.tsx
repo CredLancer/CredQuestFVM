@@ -83,7 +83,7 @@ const LancerProfile: NextPage = () => {
       // Verify signature when sign message succeeds
       const address = verifyMessage(variables.message, data)
       //setSignMsg(data);
-      console.log(typeof(data));
+      console.log(data);
       var value = data;
       //postLancer(value);
     },
