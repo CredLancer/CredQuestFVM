@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, ProposalStatus, QuestStatus } from "@prisma/client";
 import { TransferSingleEvent } from "../../typechain-types/contracts/Credential";
 
 const prisma = new PrismaClient();
@@ -33,5 +33,13 @@ export default async function credentialSingleTransferHandler(
       quest: { connect: { id: id.toString() } },
       holder: { connect: { address: to } },
     },
+  });
+  await prisma.proposal.updateMany({
+    where: { questId: id.toString(), proposer: to },
+    data: { status: ProposalStatus.Awarded },
+  });
+  await prisma.quest.update({
+    where: { id: id.toString() },
+    data: { status: QuestStatus.Awarded },
   });
 }

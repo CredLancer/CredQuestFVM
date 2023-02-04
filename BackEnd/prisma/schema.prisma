@@ -69,6 +69,7 @@ enum ProposalStatus {
   Proposed
   Accepted
   Rejected
+  Awarded
 }
 
 model QuestFile {
