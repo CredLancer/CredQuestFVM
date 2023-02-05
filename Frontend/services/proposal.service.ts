@@ -25,4 +25,10 @@ export class ProposalService {
       method: "GET",
     }).then((res) => res.json());
   }
+
+  static async fetchProposalsFromLancer(address: string) {
+    return fetch(`${BASE_URL}/proposal/address/${address}`, {
+      method: "GET",
+    }).then((res) => res.json());
+  }
 }

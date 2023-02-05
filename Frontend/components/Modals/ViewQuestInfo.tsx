@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Button,
   Flex,
@@ -36,37 +37,40 @@ import {
 import { LancerService, ProposalService } from "../../services";
 import { ORGANIZATION_CONTRACT, QUEST_CONTRACT } from "../../utils/constants";
 import { useQuery } from "react-query";
-import { QuestProposalType } from "../../utils/models";
+import { ProposalStatus, QuestProposalType } from "../../utils/models";
 
 type SingleProposalProps = QuestProposalType;
 
 const ViewSingleProposal: React.FC<SingleProposalProps> = ({ ...proposal }) => {
-  const { data: proposalData } = useQuery(["proposal.id", proposal.id], () =>
-    ProposalService.fetchQuestByCID(proposal.id)
-  );
-  console.log({ proposalData });
   return (
     <Grid gridTemplateColumns="7em 1fr 10em">
       <GridItem>
         <SkeletonCircle size="20" />
+        <Badge mt="4" colorScheme="blue" p="2">
+          {proposal.status}
+        </Badge>
       </GridItem>
 
       <GridItem>
         <Flex direction="column" gap="3">
-          <Text fontWeight="600">John Doe</Text>
-          <Text color="#E8EDF6">Description goes here!</Text>
+          <Text fontWeight="600">{proposal.proposer.name}</Text>
+          <Text color="#E8EDF6" noOfLines={5}>
+            {proposal.file.description}
+          </Text>
         </Flex>
       </GridItem>
 
       <GridItem>
-        <VStack gap="3">
-          <Button w="full" colorScheme="pink">
-            Accept
-          </Button>
-          <Button w="full" colorScheme="whiteAlpha">
-            Reject
-          </Button>
-        </VStack>
+        {proposal.status === ProposalStatus.Proposed ? (
+          <VStack gap="3">
+            <Button w="full" colorScheme="pink">
+              Accept
+            </Button>
+            <Button w="full" colorScheme="whiteAlpha">
+              Reject
+            </Button>
+          </VStack>
+        ) : null}
       </GridItem>
     </Grid>
   );
@@ -120,11 +124,11 @@ export const ViewQuestInfoModal: React.FC<Props> = ({ questId }) => {
           <ModalBody>
             <Box>
               <Heading textAlign="center" fontFamily="Aclonica">
-                Pending Proposals
+                View Proposals
               </Heading>
 
               <Box mt="8">
-                {proposal?.proposals ? (
+                {proposal?.proposals.length ? (
                   proposal.proposals.map((proposal) => (
                     <ViewSingleProposal {...proposal} />
                   ))
