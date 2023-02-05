@@ -78,7 +78,7 @@ export const LancerUserProfileView: React.FC<Props> = ({
       ) : (
         <Box mt="8" mx="auto" textAlign="center">
           <Button
-            onClick={() => router.push(`/profile/update?user=org`)}
+            onClick={() => router.push(`/profile/update?user=lancer`)}
             colorScheme="red"
           >
             Create Lancer Profile

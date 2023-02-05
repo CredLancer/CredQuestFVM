@@ -16,6 +16,7 @@
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@heroicons/react": "^2.0.13",
+    "@lighthouse-web3/sdk": "^0.1.12",
     "@rainbow-me/rainbowkit": "^0.8.1",
     "@rainbow-me/rainbowkit-siwe-next-auth": "^0.1.5",
     "@svgr/webpack": "^6.5.1",

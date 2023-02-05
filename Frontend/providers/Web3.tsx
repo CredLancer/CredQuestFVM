@@ -1,6 +1,6 @@
 import { useColorMode } from "@chakra-ui/react";
 import { ReactNode } from "react";
-import { AppProps } from 'next/app';
+import { AppProps } from "next/app";
 
 import { RainbowKitProvider, getDefaultWallets } from "@rainbow-me/rainbowkit";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
@@ -55,7 +55,6 @@ const wagmiClient = createClient({
 export function Web3Provider(props: Props, { Component, pageProps }: AppProps) {
   return (
     <WagmiConfig client={wagmiClient}>
-      
       <RainbowKitProvider chains={chains}>{props.children}</RainbowKitProvider>
     </WagmiConfig>
   );

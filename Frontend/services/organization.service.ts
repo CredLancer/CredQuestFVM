@@ -14,4 +14,10 @@ export class OrganizationService {
       method: "GET",
     }).then((res) => res.json());
   }
+
+  static async findOrganizationById(orgId: number) {
+    return fetch(`${BASE_URL}/organization/${orgId}`, {
+      method: "GET",
+    }).then((res) => res.json());
+  }
 }

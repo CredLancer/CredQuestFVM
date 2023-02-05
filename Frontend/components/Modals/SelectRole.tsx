@@ -60,7 +60,7 @@ const roles: RoleData[] = [
   {
     id: "hunter",
     name: "credlancer",
-    href: "/lancer/quests?tab=0",
+    href: "/quests?tab=0",
     disabled: (mode) => mode === "join-quest",
   },
 ];

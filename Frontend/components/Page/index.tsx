@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import { Box, Flex, HStack, Link, Stack } from "@chakra-ui/layout";
 import Logo from "../../assets/svg/credlancer_logo.svg";
 import NextLink from "next/link";
@@ -10,11 +10,18 @@ import { Button, Input } from "@chakra-ui/react";
 import { useAccount } from "wagmi";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useRouter } from "next/router";
+import { SelectRoleModal } from "../Modals/SelectRole";
+import { SelectProfileToDisplayModal } from "../Modals";
 // import { useWallet } from '../../context/wallet-provider'
 
 export const Page: FC<{ children?: React.ReactNode }> = ({ children }) => {
   const { isConnected } = useAccount();
+  const [openModal, setOpen] = useState(false);
   const router = useRouter();
+
+  if (openModal) {
+    return <SelectProfileToDisplayModal handleClose={() => setOpen(false)} />;
+  }
 
   return (
     <>
@@ -36,14 +43,11 @@ export const Page: FC<{ children?: React.ReactNode }> = ({ children }) => {
 
               <Flex gap="6">
                 {isConnected && (
-                  <Button
-                    colorScheme="blue"
-                    onClick={() => router.push("/profile")}
-                  >
+                  <Button colorScheme="blue" onClick={() => setOpen(true)}>
                     Profile
                   </Button>
                 )}
-
+                {/* 
                 {isConnected && (
                   <Button
                     colorScheme="blue"
@@ -51,8 +55,7 @@ export const Page: FC<{ children?: React.ReactNode }> = ({ children }) => {
                   >
                     Lancer Profile
                   </Button>
-                )}
-
+                )} */}
 
                 <ConnectButton label="Join Us" />
               </Flex>

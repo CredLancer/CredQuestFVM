@@ -28,16 +28,31 @@ import { useQuery } from "react-query";
 import { SelectRoleModal } from "../../components/Modals/SelectRole";
 import { useRouter } from "next/router";
 import { OrganizationService } from "../../services/organization.service";
+import {
+  LancerUserProfileView,
+  OrganizationUserProfileView,
+} from "../../components/views";
+import { LancerService } from "../../services";
 
 const UserProfile: NextPage = () => {
   const router = useRouter();
   const { address } = useAccount();
-  const { data, isLoading, isError, error } = useQuery(
+  const { data } = useQuery(
     ["organization.address", address],
-    () => OrganizationService.findOrganizationByAddress(`${address}`)
+    () => OrganizationService.findOrganizationByAddress(`${address}`),
+    {
+      enabled: !!address,
+      retry: 2,
+    }
   );
-
-  console.log({ data });
+  const { data: lancer, isLoading: loadingLancer } = useQuery(
+    ["lancer.profile", address],
+    () => LancerService.fecthLancer(address ?? ""),
+    {
+      enabled: !!address,
+      retry: 2,
+    }
+  );
 
   return (
     <Box bgGradient="linear(#71DCCC 0%, #E8EDF6 25%, #71DCCC 75%)" minH="3xl">
@@ -62,149 +77,33 @@ const UserProfile: NextPage = () => {
             </Heading>
 
             <Button
-              onClick={() => router.push("/profile/update")}
+              onClick={() =>
+                router.push(`/profile/update?user=${router.query.user}`)
+              }
               variant="link"
             >
-              Edit Profile
+              {router.query.user === "org"
+                ? data?.org
+                  ? "Edit Profile"
+                  : "Create Profile"
+                : null}
+
+              {router.query.user === "lancer"
+                ? lancer?.registered
+                  ? "Edit Profile"
+                  : "Create Profile"
+                : null}
             </Button>
           </Flex>
 
-          {isLoading ? (
-            <Box textAlign="center">
-              <Spinner size="lg" />
-            </Box>
-          ) : (
-            <Grid
-              gridTemplateColumns="1fr auto"
-              justifyContent="space-between"
-              padding="3em"
-              gap="1em"
-            >
-              <GridItem>
-                <Grid
-                  gridTemplateColumns="200px 1fr"
-                  alignItems="flex-end"
-                  gap="1em"
-                  justifyContent="space-between"
-                >
-                  <GridItem>
-                    <Heading as="h3" fontSize="xl" textAlign="center">
-                      {data?.org?.name}
-                    </Heading>
-                    <SkeletonCircle
-                      size="20"
-                      m="auto"
-                      mt="4"
-                      startColor="pink.500"
-                      endColor="orange.500"
-                    />
-                  </GridItem>
-                  <GridItem>
-                    <Box pb="4">
-                      <Heading as="h2" fontSize="larger">
-                        Web3 Builder & Full-Stack Developer
-                      </Heading>
-                      <Text mt="4" color="#E8EDF6" noOfLines={2}>
-                        {data?.org?.description ??
-                          "Creating In-game graphics, audio engineering, VR"}
-                      </Text>
-                    </Box>
-                  </GridItem>
-                </Grid>
-              </GridItem>
+          {router.query.user === "org" && <OrganizationUserProfileView />}
 
-              <GridItem alignSelf="center" justifySelf="center">
-                <VStack>
-                  <Button
-                    onClick={() => router.push("/quests?tab=1")}
-                    colorScheme="blue"
-                  >
-                    Create Quest
-                  </Button>
-                  <Button
-                    onClick={() => router.push("/quests?tab=0")}
-                    colorScheme="blue"
-                    variant="outline"
-                  >
-                    View Quests
-                  </Button>
-                </VStack>
-              </GridItem>
-            </Grid>
+          {router.query.user === "lancer" && (
+            <LancerUserProfileView
+              isLoading={loadingLancer}
+              lancer={lancer?.lancer}
+            />
           )}
-
-          <Box px="3em">
-            {data?.org ? (
-              <Button colorScheme="pink">Connect Discord</Button>
-            ) : null}
-          </Box>
-
-          <Accordion px="3em" mt="8" allowMultiple allowToggle>
-            <AccordionItem>
-              <h2>
-                <AccordionButton
-                  bg="#321975"
-                  color="white"
-                  _hover={{ bg: "#321975" }}
-                >
-                  <Box as="span" flex="1" textAlign="left">
-                    DAO Analytics
-                  </Box>
-                  <AccordionIcon />
-                </AccordionButton>
-              </h2>
-              <AccordionPanel
-                bg="#E8EDF6"
-                my="10"
-                py={10}
-                px="24"
-                color="black"
-              >
-                <HStack
-                  spacing="24px"
-                  alignItems="stretch"
-                  justifyContent="space-evenly"
-                >
-                  {[
-                    { name: "members", value: 0, display: "Disord Members" },
-                    { name: "holders", value: 0, display: "NFT Holders" },
-                    {
-                      name: "followers",
-                      value: 0,
-                      display: "Twitter Followers",
-                    },
-                    {
-                      name: "transactions",
-                      value: 100,
-                      display: "Transactions",
-                    },
-                  ].map((stat) => (
-                    <Flex
-                      alignItems="center"
-                      justifyContent="center"
-                      gap="3"
-                      color="#0A0017"
-                      p="6"
-                      borderRadius="6"
-                      direction="column"
-                      bg="#71DCCC"
-                      border="2px solid #E8EDF6"
-                      boxShadow="0px 4px 4px rgba(0, 0, 0, 0.25)"
-                      key={stat.name}
-                      width="fit-content"
-                    >
-                      <Text fontWeight="extrabold">
-                        {stat.value.toLocaleString()}
-                      </Text>
-                      <Text textAlign="center" fontSize="large">
-                        {stat.display}
-                      </Text>
-                    </Flex>
-                  ))}
-                </HStack>
-              </AccordionPanel>
-            </AccordionItem>
-          </Accordion>
         </Box>
       </Container>
     </Box>

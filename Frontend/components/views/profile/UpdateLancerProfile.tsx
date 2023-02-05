@@ -200,6 +200,20 @@ export const UpdateLancerProfile = () => {
 
           <GridItem colSpan={2}>
             <FormControl>
+              <FormLabel htmlFor="title">Job Title</FormLabel>
+              <Input
+                bg="white.2"
+                borderRadius="2px"
+                {...register("title")}
+                id="title"
+                type="text"
+                color="black.5"
+              />
+            </FormControl>
+          </GridItem>
+
+          <GridItem colSpan={2}>
+            <FormControl>
               <FormLabel htmlFor="email">Email Address</FormLabel>
               <Input
                 bg="white.2"
@@ -212,7 +226,7 @@ export const UpdateLancerProfile = () => {
             </FormControl>
           </GridItem>
 
-          <GridItem colSpan={3}>
+          <GridItem colSpan={2}>
             <FormControl>
               <FormLabel htmlFor="lancer_description">Description</FormLabel>
               <Input
