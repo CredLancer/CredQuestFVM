@@ -31,6 +31,10 @@ import {
     const { data, isLoading } = useQuery([`Quest-${questID}`, questCID], () =>
       QuestService.fetchQuestByCID(questCID)
     );
+
+    const applyQuest = (input: string) => {
+      console.log(input);
+    } 
     
     return isLoading ? (
       <Spinner />
@@ -66,7 +70,7 @@ import {
           </Button>) 
           : (
             <Button
-            onClick={() => console.log({ questCID })}
+            onClick={() => applyQuest({ questCID })}
             colorScheme="pink"
             w="100%"
           >
