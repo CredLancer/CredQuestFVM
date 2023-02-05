@@ -2,12 +2,18 @@ import { Lancer, PrismaClient } from "@prisma/client";
 import CID from "cids";
 import { Router } from "express";
 import { body, param } from "express-validator";
-import { generateNonce, getNonceMessage, uploadToIPFS } from "../helpers";
+import {
+  generateNonce,
+  getCredentialsFromQuestIds,
+  getNonceMessage,
+  uploadToIPFS,
+} from "../helpers";
 import { authorizeUser, file, validate } from "../middlewares";
 
 const lancerRouter = Router();
 const prisma = new PrismaClient();
 
+// get nonce message
 lancerRouter.get(
   "/:address",
   param("address").isEthereumAddress(),
@@ -15,15 +21,19 @@ lancerRouter.get(
   async (req, res) => {
     const { address } = req.params;
 
-    const lancer = (await prisma.lancer.findUnique({
+    const lancer = await prisma.lancer.findUnique({
       where: { address: address as string },
       include: { Credential: true },
-    })) as Lancer;
+    });
     if (lancer) {
+      const questsCompleted = await getCredentialsFromQuestIds(
+        lancer.Credential.map((cred) => cred.id)
+      );
       if (lancer.registered)
         return res.json({
           lancer,
           registered: true,
+          questsCompleted,
           message: getNonceMessage(lancer.nonce),
         });
       return res.json({
