@@ -13,6 +13,8 @@ export interface QuestProposalType {
   workCID?: string;
 }
 
+export interface LancerProposal {}
+
 export enum ProposalStatus {
   Proposed = "Proposed",
   Accepted = "Accepted",

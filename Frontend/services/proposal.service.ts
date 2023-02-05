@@ -27,8 +27,12 @@ export class ProposalService {
   }
 
   static async fetchProposalsFromLancer(address: string) {
+    console.log({ proposer: address });
     return fetch(`${BASE_URL}/proposal/address/${address}`, {
       method: "GET",
+      headers: {
+        "content-type": "application/json",
+      },
     }).then((res) => res.json());
   }
 }

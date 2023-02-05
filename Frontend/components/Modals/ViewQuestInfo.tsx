@@ -42,6 +42,13 @@ import { ProposalStatus, QuestProposalType } from "../../utils/models";
 type SingleProposalProps = QuestProposalType;
 
 const ViewSingleProposal: React.FC<SingleProposalProps> = ({ ...proposal }) => {
+  const { address } = useAccount();
+  const { data: lancerProosals } = useQuery(
+    ["proposal.lancer", address],
+    () => ProposalService.fetchProposalsFromLancer(`${address}`),
+    { enabled: !!address }
+  );
+  console.log({ lancerProosals });
   return (
     <Grid gridTemplateColumns="7em 1fr 10em">
       <GridItem>
