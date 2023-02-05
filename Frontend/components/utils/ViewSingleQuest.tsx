@@ -29,7 +29,6 @@ interface ComponentProps extends QuestResponse {
 export const ViewSingleQuest: React.FC<QuestResponse> = ({ ...quest }) => {
   const { updateSelectedQuest, updateEditQuestStatus } = useQuestContext()!;
   const router = useRouter();
-  const [image, setImage] = useState();
   const { address } = useAccount();
   const { questCID, id, orgId } = quest;
   const { data, isLoading } = useQuery([`Quest-${id}`, questCID], () =>
@@ -75,7 +74,7 @@ export const ViewSingleQuest: React.FC<QuestResponse> = ({ ...quest }) => {
     updateEditQuestStatus(true);
     router.push("/quests?tab=1");
   };
-  console.log({ image });
+  console.log({ lancer });
 
   return isLoading ? (
     <Spinner />
@@ -84,7 +83,7 @@ export const ViewSingleQuest: React.FC<QuestResponse> = ({ ...quest }) => {
       <Box>
         <SkeletonCircle size="20" isLoaded={!!organization}>
           <Text>{organization?.org.name}</Text>
-          <Image src={image as any as string} />
+          {/* <Image src={image as any as string} /> */}
         </SkeletonCircle>
       </Box>
 
