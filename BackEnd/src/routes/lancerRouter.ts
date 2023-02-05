@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { Lancer, PrismaClient } from "@prisma/client";
 import CID from "cids";
 import { Router } from "express";
 import { body, param } from "express-validator";
@@ -30,7 +30,12 @@ lancerRouter.get(
         lancer.Credential.map((cred) => cred.id)
       );
       if (lancer.registered)
-        return res.json({ lancer, registered: true, questsCompleted });
+        return res.json({
+          lancer,
+          registered: true,
+          questsCompleted,
+          message: getNonceMessage(lancer.nonce),
+        });
       return res.json({
         registered: false,
         message: getNonceMessage(lancer.nonce),
