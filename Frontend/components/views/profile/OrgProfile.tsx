@@ -32,8 +32,13 @@ import { OrganizationService } from "../../../services/organization.service";
 export const OrganizationUserProfileView = () => {
   const router = useRouter();
   const { address } = useAccount();
-  const { data, isLoading } = useQuery(["organization.address", address], () =>
-    OrganizationService.findOrganizationByAddress(`${address}`)
+  const { data, isLoading } = useQuery(
+    ["organization.address", address],
+    () => OrganizationService.findOrganizationByAddress(`${address}`),
+    {
+      enabled: !!address,
+      retry: 2,
+    }
   );
 
   return (

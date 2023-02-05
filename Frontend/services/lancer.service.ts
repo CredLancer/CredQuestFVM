@@ -32,10 +32,4 @@ export class LancerService {
       body: data,
     }).then((res) => res.json());
   }
-
-  // static async findOrganizationByAddress(address: string) {
-  //   return fetch(`${BASE_URL}/organization/admin/${address}`, {
-  //     method: "GET",
-  //   }).then((res) => res.json());
-  // }
 }

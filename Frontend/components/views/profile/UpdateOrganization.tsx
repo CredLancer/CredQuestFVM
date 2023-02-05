@@ -40,7 +40,7 @@ type LogoInfo = {
 export const UpdateOrganizationProfile = () => {
   const { address } = useAccount();
   const { data: signer } = useSigner();
-  const provider = useWebSocketProvider();
+  const provider = useWebSocketProvider({ chainId: 3141 });
   const contract = useContract({
     address: ORGANIZATION_CONTRACT,
     abi: ORGANIZATION_ABI,
@@ -63,6 +63,7 @@ export const UpdateOrganizationProfile = () => {
   });
   const [uploadedLogo, setUploadedLogo] = useState<LogoInfo>();
 
+  console.log({ provider });
   const onSubmit = (model: any) => {
     console.log({ model });
 
@@ -82,10 +83,10 @@ export const UpdateOrganizationProfile = () => {
         console.log({ response });
         const { name, imageCID, signature, nonce } = response;
         contract?.createOrganization(name, imageCID, signature, nonce, {
-          maxPriorityFeePerGas: await provider?.send(
-            "eth_maxPriorityFeePerGas",
-            []
-          ),
+          // maxPriorityFeePerGas: await provider?.send(
+          //   "eth_maxPriorityFeePerGas",
+          //   []
+          // ),
         });
       },
     });
