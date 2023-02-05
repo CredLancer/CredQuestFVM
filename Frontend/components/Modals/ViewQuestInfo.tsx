@@ -1,4 +1,5 @@
 import {
+  Badge,
   Box,
   Button,
   Flex,
@@ -36,6 +37,100 @@ import {
 import { LancerService, ProposalService } from "../../services";
 import { ORGANIZATION_CONTRACT, QUEST_CONTRACT } from "../../utils/constants";
 import { useQuery } from "react-query";
+import { ProposalStatus, QuestProposalType } from "../../utils/models";
+
+type SingleProposalProps = QuestProposalType;
+
+const ViewSingleProposal: React.FC<SingleProposalProps> = ({ ...proposal }) => {
+  const { address } = useAccount();
+  const { data: signer } = useSigner();
+  const provider = useWebSocketProvider({ chainId: 3141 });
+  const contract = useContract({
+    address: QUEST_CONTRACT,
+    abi: QUEST_ABI,
+    signerOrProvider: signer,
+  });
+
+  console.log({ proposal });
+
+  const manageProposal = async (id: string, action: "accept" | "reject") => {
+    console.log({ id });
+    action === "accept"
+      ? contract?.acceptProposal(id, {
+          maxPriorityFeePerGas: await provider?.send(
+            "eth_maxPriorityFeePerGas",
+            []
+          ),
+        })
+      : contract?.rejectProposal(id, {
+          maxPriorityFeePerGas: await provider?.send(
+            "eth_maxPriorityFeePerGas",
+            []
+          ),
+        });
+  };
+
+  return (
+    <Grid mt="6" gridTemplateColumns="7em 1fr 10em">
+      <GridItem>
+        <SkeletonCircle size="20" />
+        <Badge
+          mt="4"
+          colorScheme={
+            proposal.status === ProposalStatus.Accepted
+              ? "green"
+              : proposal.status === ProposalStatus.Proposed
+              ? "orange"
+              : proposal.status === ProposalStatus.Rejected
+              ? "red"
+              : "yellow"
+          }
+          p="2"
+        >
+          {proposal.status === ProposalStatus.Accepted && "In Progress"}
+          {proposal.status === ProposalStatus.Proposed &&
+            ProposalStatus.Proposed}
+        </Badge>
+      </GridItem>
+
+      <GridItem>
+        <Flex direction="column" gap="3">
+          <Text fontWeight="600">{proposal.proposer.name}</Text>
+          <Text color="#E8EDF6" noOfLines={5}>
+            {proposal.file.description}
+          </Text>
+        </Flex>
+      </GridItem>
+
+      <GridItem>
+        {proposal.status === ProposalStatus.Proposed ? (
+          <VStack gap="3">
+            <Button
+              onClick={() => manageProposal(proposal.id, "accept")}
+              w="full"
+              colorScheme="pink"
+            >
+              Accept
+            </Button>
+
+            <Button
+              w="full"
+              variant="outline"
+              onClick={() => manageProposal(proposal.id, "reject")}
+              colorScheme="pink"
+            >
+              Reject
+            </Button>
+          </VStack>
+        ) : (
+          <Badge mt="4" w="full" textAlign="center" colorScheme="blue" p="2">
+            {proposal.status}
+          </Badge>
+        )}
+      </GridItem>
+    </Grid>
+  );
+};
 
 interface Props {
   questId: number;
@@ -85,33 +180,19 @@ export const ViewQuestInfoModal: React.FC<Props> = ({ questId }) => {
           <ModalBody>
             <Box>
               <Heading textAlign="center" fontFamily="Aclonica">
-                Pending Proposals
+                View Proposals
               </Heading>
 
               <Box mt="8">
-                <Grid gridTemplateColumns="7em 1fr 10em">
-                  <GridItem>
-                    <SkeletonCircle size="20" />
-                  </GridItem>
-
-                  <GridItem>
-                    <Flex direction="column" gap="3">
-                      <Text fontWeight="600">John Doe</Text>
-                      <Text color="#E8EDF6">Description goes here!</Text>
-                    </Flex>
-                  </GridItem>
-
-                  <GridItem>
-                    <VStack gap="3">
-                      <Button w="full" colorScheme="pink">
-                        Accept
-                      </Button>
-                      <Button w="full" colorScheme="whiteAlpha">
-                        Reject
-                      </Button>
-                    </VStack>
-                  </GridItem>
-                </Grid>
+                {proposal?.proposals.length ? (
+                  proposal.proposals.map((proposal) => (
+                    <ViewSingleProposal {...proposal} />
+                  ))
+                ) : (
+                  <Box textAlign="center" color="red">
+                    No Available Proposals
+                  </Box>
+                )}
               </Box>
             </Box>
           </ModalBody>

@@ -112,13 +112,14 @@ proposalRouter.get(
 
     let proposals = await prisma.proposal.findMany({
       where: { proposer: address },
+      include: { quest: { include: { org: true } } },
     });
     proposals = await Promise.all(
       proposals.map(async (proposal) => {
         const file = await prisma.proposalFile.findUnique({
           where: { cid: proposal.fileCID },
         });
-        return { ...file, ...proposal };
+        return { file, ...proposal };
       })
     );
     res.json({ proposals });
@@ -141,14 +142,17 @@ proposalRouter.get(
     let proposals = await prisma.proposal.findMany({
       where: { questId },
     });
-    proposals = await Promise.all(
+    proposals = (await Promise.all(
       proposals.map(async (proposal) => {
         const file = await prisma.proposalFile.findUnique({
           where: { cid: proposal.fileCID },
         });
-        return { ...file, ...proposal };
+        const proposer = await prisma.lancer.findUnique({
+          where: { address: proposal.proposer },
+        });
+        return { file, ...proposal, proposer };
       })
-    );
+    )) as any;
     res.json({ proposals });
   }
 );

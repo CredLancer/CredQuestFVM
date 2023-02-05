@@ -50,7 +50,7 @@ export const LancerUserProfileView: React.FC<Props> = ({
             >
               <GridItem>
                 <Heading as="h3" fontSize="xl" textAlign="center">
-                  Freelancer User
+                  {lancer?.name}
                 </Heading>
                 <SkeletonCircle
                   size="20"
@@ -63,7 +63,7 @@ export const LancerUserProfileView: React.FC<Props> = ({
               <GridItem>
                 <Box>
                   <Heading>Industry</Heading>
-                  <Text>Creating In-game graphics, audio engineering, VR</Text>
+                  <Text>{lancer?.description}</Text>
                 </Box>
               </GridItem>
             </Grid>
