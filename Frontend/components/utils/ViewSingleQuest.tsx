@@ -115,7 +115,7 @@ export const ViewSingleQuest: React.FC<QuestResponse> = ({ ...quest }) => {
           </Button>
         )}
 
-        <ViewQuestInfoModal questId={id} />
+        {userAsOrg?.org ? <ViewQuestInfoModal questId={id} /> : null}
       </VStack>
     </Flex>
   );
