@@ -35,6 +35,10 @@ import {
     const applyQuest = (input: string) => {
       console.log(input);
     } 
+
+    const completeQuest = (input: string) => {
+      console.log(input);
+    } 
     
     return isLoading ? (
       <Spinner />
@@ -62,7 +66,7 @@ import {
           <span>{isOpen}</span>
           { isOpen ? 
           (<Button
-            onClick={() => console.log({ questCID })}
+            onClick={() => applyQuest(questCID)}
             colorScheme="pink"
             w="100%"
           >
@@ -70,7 +74,7 @@ import {
           </Button>) 
           : (
             <Button
-            onClick={() => applyQuest({ questCID })}
+            onClick={() => completeQuest(questCID)}
             colorScheme="pink"
             w="100%"
           >
