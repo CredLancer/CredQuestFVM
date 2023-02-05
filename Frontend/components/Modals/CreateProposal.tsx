@@ -16,11 +16,12 @@ import {
   ModalOverlay,
   Spinner,
   Text,
+  Textarea,
   useDisclosure,
 } from "@chakra-ui/react";
 import React from "react";
 import { useForm } from "react-hook-form";
-import ORGANIZATION_ABI from "../../assets/contracts/OrganizationController.json";
+import QUEST_ABI from "../../assets/contracts/QuestController.json";
 import { toast } from "react-toastify";
 import {
   useAccount,
@@ -31,7 +32,7 @@ import {
   useWebSocketProvider,
 } from "wagmi";
 import { LancerService, ProposalService } from "../../services";
-import { ORGANIZATION_CONTRACT } from "../../utils/constants";
+import { ORGANIZATION_CONTRACT, QUEST_CONTRACT } from "../../utils/constants";
 import { useQuery } from "react-query";
 
 interface Props {
@@ -55,8 +56,8 @@ export const CreateProposalModal: React.FC<Props> = ({ questId }) => {
   const { data: signer } = useSigner();
   const provider = useWebSocketProvider({ chainId: 3141 });
   const contract = useContract({
-    address: ORGANIZATION_CONTRACT,
-    abi: ORGANIZATION_ABI,
+    address: QUEST_CONTRACT,
+    abi: QUEST_ABI,
     signerOrProvider: signer,
   });
   const { isLoading, signMessage } = useSignMessage({
@@ -75,7 +76,7 @@ export const CreateProposalModal: React.FC<Props> = ({ questId }) => {
 
     signMessage({
       ...data,
-      message: (lancerSignatureOrProfile as any).lancer.nonce,
+      message: (lancerSignatureOrProfile as any).message,
     });
   };
 
@@ -91,13 +92,15 @@ export const CreateProposalModal: React.FC<Props> = ({ questId }) => {
     mutate(data, {
       onSuccess: async (data) => {
         console.log({ data });
-        // const { name, imageCID, signature, nonce } = data;
-        // contract?.sendProposal(name, imageCID, signature, nonce, {
-        //   maxPriorityFeePerGas: await provider?.send(
-        //     "eth_maxPriorityFeePerGas",
-        //     []
-        //   ),
-        // });
+        const { proposalCID, signature, nonce } = data;
+        await contract?.sendProposal(questId, proposalCID, signature, nonce, {
+          maxPriorityFeePerGas: await provider?.send(
+            "eth_maxPriorityFeePerGas",
+            []
+          ),
+        });
+        toast.success("Proposal Created Successfully");
+        onClose();
       },
     });
   };
@@ -138,12 +141,12 @@ export const CreateProposalModal: React.FC<Props> = ({ questId }) => {
                       <FormLabel htmlFor="description">
                         Proposal: (how will you complete this quest)
                       </FormLabel>
-                      <Input
+                      <Textarea
                         bg="white.2"
                         borderRadius="2px"
                         {...register("description")}
                         id="description"
-                        type="text"
+                        height="250px"
                         color="black.5"
                       />
                     </FormControl>

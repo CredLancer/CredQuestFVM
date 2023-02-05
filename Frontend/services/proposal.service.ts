@@ -10,4 +10,10 @@ export class ProposalService {
       },
     }).then((res) => res.json());
   }
+
+  static async fetchProposalsbyQuestId(questID: number) {
+    return fetch(`${BASE_URL}/proposal/questId/${questID}`, {
+      method: "GET",
+    }).then((res) => res.json());
+  }
 }
