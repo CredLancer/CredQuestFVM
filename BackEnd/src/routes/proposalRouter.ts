@@ -119,7 +119,7 @@ proposalRouter.get(
         const file = await prisma.proposalFile.findUnique({
           where: { cid: proposal.fileCID },
         });
-        return { ...file, ...proposal };
+        return { file, ...proposal };
       })
     );
     res.json({ proposals });
