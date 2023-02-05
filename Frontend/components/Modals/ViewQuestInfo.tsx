@@ -51,7 +51,10 @@ const ViewSingleProposal: React.FC<SingleProposalProps> = ({ ...proposal }) => {
     signerOrProvider: signer,
   });
 
-  const manageProposal = async (id: string, action: "accept" | "reject") =>
+  console.log({ proposal });
+
+  const manageProposal = async (id: string, action: "accept" | "reject") => {
+    console.log({ id });
     action === "accept"
       ? contract?.acceptProposal(id, {
           maxPriorityFeePerGas: await provider?.send(
@@ -65,6 +68,7 @@ const ViewSingleProposal: React.FC<SingleProposalProps> = ({ ...proposal }) => {
             []
           ),
         });
+  };
 
   return (
     <Grid gridTemplateColumns="7em 1fr 10em">

@@ -12,19 +12,33 @@ import {
   GridItem,
 } from "@chakra-ui/react";
 import { useQuery } from "react-query";
+import { useAccount } from "wagmi";
 import { useQuestContext } from "../../providers/Quest";
-import { QuestService } from "../../services";
+import { OrganizationService, QuestService } from "../../services";
 import { QuestResponse } from "../../utils/models";
 import { ViewSingleQuest } from "../utils";
 
 export const ListQuestsView = () => {
+  const { address } = useAccount();
+  const { data: org } = useQuery(
+    ["organization.address", address],
+    () => OrganizationService.findOrganizationByAddress(`${address}`),
+    {
+      enabled: !!address,
+    }
+  );
   const { updateSelectedQuest } = useQuestContext()!;
   const { data, isLoading } = useQuery(
-    "quests",
-    () => QuestService.fetchQuests(),
-    { retry: 2, onSuccess: () => updateSelectedQuest(undefined) }
+    ["quests.orgID", org?.org?.id],
+    () => QuestService.fetchQuestByOrgID(org?.org?.id),
+    {
+      retry: 2,
+      enabled: !!org?.org,
+      onSuccess: () => updateSelectedQuest(undefined),
+    }
   );
 
+  console.log({ data });
   return isLoading ? (
     <Flex alignItems="center" justifyContent="center">
       <Spinner size="md" />

@@ -19,6 +19,12 @@ export class QuestService {
     }).then((res) => res.json());
   }
 
+  static async fetchQuestByOrgID(orgId: number) {
+    return await fetch(`${BASE_URL}/quest/organizationId/${orgId}`, {
+      method: "GET",
+    }).then((res) => res.json());
+  }
+
   static async fetchQuestByCID(cid: string) {
     return fetch(`${LIGHTHOUSE_URL}${cid.substring(2)}`, {
       method: "GET",
