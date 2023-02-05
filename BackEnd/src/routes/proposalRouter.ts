@@ -112,6 +112,7 @@ proposalRouter.get(
 
     let proposals = await prisma.proposal.findMany({
       where: { proposer: address },
+      include: { quest: { include: { org: true } } },
     });
     proposals = await Promise.all(
       proposals.map(async (proposal) => {
