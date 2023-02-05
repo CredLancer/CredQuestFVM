@@ -43,12 +43,29 @@ type SingleProposalProps = QuestProposalType;
 
 const ViewSingleProposal: React.FC<SingleProposalProps> = ({ ...proposal }) => {
   const { address } = useAccount();
-  const { data: lancerProosals } = useQuery(
-    ["proposal.lancer", address],
-    () => ProposalService.fetchProposalsFromLancer(`${address}`),
-    { enabled: !!address }
-  );
-  console.log({ lancerProosals });
+  const { data: signer } = useSigner();
+  const provider = useWebSocketProvider({ chainId: 3141 });
+  const contract = useContract({
+    address: QUEST_CONTRACT,
+    abi: QUEST_ABI,
+    signerOrProvider: signer,
+  });
+
+  const manageProposal = async (id: string, action: "accept" | "reject") =>
+    action === "accept"
+      ? contract?.acceptProposal(id, {
+          maxPriorityFeePerGas: await provider?.send(
+            "eth_maxPriorityFeePerGas",
+            []
+          ),
+        })
+      : contract?.rejectProposal(id, {
+          maxPriorityFeePerGas: await provider?.send(
+            "eth_maxPriorityFeePerGas",
+            []
+          ),
+        });
+
   return (
     <Grid gridTemplateColumns="7em 1fr 10em">
       <GridItem>
@@ -70,10 +87,19 @@ const ViewSingleProposal: React.FC<SingleProposalProps> = ({ ...proposal }) => {
       <GridItem>
         {proposal.status === ProposalStatus.Proposed ? (
           <VStack gap="3">
-            <Button w="full" colorScheme="pink">
+            <Button
+              onClick={() => manageProposal(proposal.id, "accept")}
+              w="full"
+              colorScheme="pink"
+            >
               Accept
             </Button>
-            <Button w="full" colorScheme="whiteAlpha">
+
+            <Button
+              w="full"
+              onClick={() => manageProposal(proposal.id, "reject")}
+              colorScheme="whiteAlpha"
+            >
               Reject
             </Button>
           </VStack>

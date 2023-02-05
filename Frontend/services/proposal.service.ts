@@ -1,5 +1,5 @@
 import { BASE_URL, LIGHTHOUSE_URL } from "../utils/constants";
-import { QuestProposalType } from "../utils/models";
+import { LancerProposal, QuestProposalType } from "../utils/models";
 
 export class ProposalService {
   static async createProposal({ questId, ...proposal }: any) {
@@ -26,8 +26,9 @@ export class ProposalService {
     }).then((res) => res.json());
   }
 
-  static async fetchProposalsFromLancer(address: string) {
-    console.log({ proposer: address });
+  static async fetchProposalsFromLancer(
+    address: string
+  ): Promise<{ proposals: LancerProposal[] }> {
     return fetch(`${BASE_URL}/proposal/address/${address}`, {
       method: "GET",
       headers: {

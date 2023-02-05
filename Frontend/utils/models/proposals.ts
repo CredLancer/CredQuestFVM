@@ -13,7 +13,32 @@ export interface QuestProposalType {
   workCID?: string;
 }
 
-export interface LancerProposal {}
+export interface OrganizationModel {
+  id: number;
+  admin: string;
+  name: string;
+  imageCID: string;
+  imageURL: string;
+  description: string;
+  video: string;
+  blockNumber: number;
+  email: string;
+}
+export interface QuestModel {
+  id: string;
+  value: string;
+  status: ProposalStatus;
+  questCID: string;
+  orgId: number;
+  deadline: string;
+  blockNumber: number;
+  org: OrganizationModel;
+}
+
+export type LancerProposal = Omit<QuestProposalType, "proposer"> & {
+  quest: QuestModel;
+  proposer: string;
+};
 
 export enum ProposalStatus {
   Proposed = "Proposed",
