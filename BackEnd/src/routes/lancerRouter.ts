@@ -20,7 +20,12 @@ lancerRouter.get(
       include: { Credential: true },
     })) as Lancer;
     if (lancer) {
-      if (lancer.registered) return res.json({ lancer, registered: true });
+      if (lancer.registered)
+        return res.json({
+          lancer,
+          registered: true,
+          message: getNonceMessage(lancer.nonce),
+        });
       return res.json({
         registered: false,
         message: getNonceMessage(lancer.nonce),

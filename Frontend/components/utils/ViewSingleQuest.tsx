@@ -20,7 +20,7 @@ import { useQuestContext } from "../../providers/Quest";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CreateProposalModal } from "../Modals";
+import { CreateProposalModal, ViewQuestInfoModal } from "../Modals";
 
 interface ComponentProps extends QuestResponse {
   handleUpdate: (quest?: QuestResponse) => void;
@@ -115,9 +115,7 @@ export const ViewSingleQuest: React.FC<QuestResponse> = ({ ...quest }) => {
           </Button>
         )}
 
-        <Button onClick={() => console.log({ id })} colorScheme="teal" w="100%">
-          View
-        </Button>
+        <ViewQuestInfoModal questId={id} />
       </VStack>
     </Flex>
   );
