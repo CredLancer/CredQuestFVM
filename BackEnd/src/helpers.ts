@@ -80,3 +80,16 @@ export async function findOrCreateSkills(skills: string[]) {
     }
   }
 }
+
+export async function getCredentialsFromQuestIds(ids: string[]) {
+  const quests = await prisma.quest.findMany({ where: { id: { in: ids } } });
+  return await Promise.all(
+    quests.map(async (quest) => {
+      const file = await prisma.questFile.findUnique({
+        where: { cid: quest.questCID },
+        include: { skills: true },
+      });
+      return { ...file, ...quest };
+    })
+  );
+}
