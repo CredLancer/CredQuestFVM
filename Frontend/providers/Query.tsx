@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider as Provider } from "react-query";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      retry: true,
+      retry: 2,
       retryDelay: 2000,
     },
   },

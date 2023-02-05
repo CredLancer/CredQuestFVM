@@ -192,7 +192,7 @@ export function authorizeUser(
 
     // update the nonce
     await prisma.lancer.update({
-      data: { nonce: generateNonce() },
+      data: { nonce: generateNonce(), registered: true },
       where: { address },
     });
 

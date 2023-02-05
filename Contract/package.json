@@ -1,10 +1,10 @@
 {
   "name": "hardhat-project",
   "scripts": {
-    "build": "hardhat compile",
-    "test": "hardhat test",
-    "coverage": "hardhat coverage",
-    "deploy": "hardhat run ./scripts/deploy.ts --network hyperspace"
+    "build": "npx hardhat compile",
+    "test": "mpx hardhat test",
+    "coverage": "npx hardhat coverage",
+    "deploy": "npx hardhat run ./scripts/deploy.ts --network hyperspace"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^2.0.1",

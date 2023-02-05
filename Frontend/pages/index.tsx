@@ -13,6 +13,7 @@ import { TribeMembers } from "../components/TribeMembers";
 import { CompletedQuests } from "../components/CompletedQuests";
 import { LeaderBoard } from "../components/LeaderBoard";
 import { useRouter } from "next/router";
+import { Footer } from "../components/Footer";
 
 type QuestType = "create-quest" | "join-quest" | undefined;
 
@@ -28,16 +29,12 @@ const CallToAction = () => {
   };
 
   const disabled = !isConnected || !address;
-  console.log({ disabled });
 
   if (openModal) {
     return (
       <SelectRoleModal
-        handleClose={() =>
-          router.push(
-            `dashboard?user${openModal === "create-quest" ? "org" : "lancer"}`
-          )
-        }
+        handleClose={() => setOpen(undefined)}
+        isOpen={openModal}
       />
     );
   }
@@ -54,7 +51,7 @@ const CallToAction = () => {
       <Flex alignItems="center" justifyContent="center" gap="8" marginTop="10">
         <Button
           onClick={() => !disabled && handleCreateQuest()}
-          // disabled={disabled}
+          disabled={disabled}
           colorScheme="blue"
           type="button"
         >
@@ -84,6 +81,7 @@ const Home: NextPage = () => {
       <CompletedQuests />
       <LeaderBoard />
       <TribeMembers />
+      <Footer />
     </Box>
   );
 };
