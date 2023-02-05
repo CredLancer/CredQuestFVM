@@ -21,15 +21,20 @@ import { useRouter } from "next/router";
 interface RoleData {
   name: string;
   id: string;
-  logo?: string;
   href: string;
+  logo?: string;
+  disabled?: (mode?: string) => boolean;
 }
 
-const DisplayRoleBox: React.FC<RoleData> = ({ name, href, logo }) => {
-
+const DisplayRoleBox: React.FC<RoleData & { isActive?: boolean }> = ({
+  name,
+  href,
+  logo,
+  isActive,
+}) => {
   const router = useRouter();
 
-  return (
+  return isActive ? (
     <Box
       border="5px solid white"
       borderTopWidth="40px"
@@ -37,39 +42,43 @@ const DisplayRoleBox: React.FC<RoleData> = ({ name, href, logo }) => {
       bg="#29116C"
       textAlign="center"
     >
-      <Box width="100%" onClick={() => router.push(href)}>
+      <Box width="100%" onClick={() => isActive && router.push(href)}>
         <Image src={logo ?? LancerKnight} alt={name} />
       </Box>
       <Text>{capitalize(name)}</Text>
     </Box>
-  );
+  ) : null;
 };
 
 const roles: RoleData[] = [
-  { id: "org", 
-  name: "organization" ,
-  href: "/dashboard?user=org"
+  {
+    id: "org",
+    name: "organization",
+    href: "/quests?tab=1",
+    disabled: (mode) => mode === "create-quest",
   },
-  { id: "hunter", 
-  name: "credlancer" ,
-  href: "/lancerDashboard?user=lancer"
+  {
+    id: "hunter",
+    name: "credlancer",
+    href: "/quests?tab=0",
+    disabled: (mode) => mode === "join-quest",
   },
 ];
 
 interface ModalProp {
   handleClose: () => void;
-  isOpen?: boolean;
+  isOpen?: string;
 }
 
 export const SelectRoleModal: React.FC<ModalProp> = ({
   handleClose,
-  isOpen = true,
+  isOpen,
 }) => {
   return (
     <Modal
       isCentered
       closeOnOverlayClick={false}
-      isOpen={isOpen}
+      isOpen={!!isOpen}
       onClose={handleClose}
     >
       <ModalOverlay
@@ -84,10 +93,19 @@ export const SelectRoleModal: React.FC<ModalProp> = ({
               Join as a:
             </Heading>
 
-            <Grid mt="12" gap="4" gridTemplateColumns="repeat(2, 1fr)">
+            <Grid
+              mt="12"
+              gap="4"
+              alignItems="center"
+              justifyContent="center"
+              gridTemplateColumns="repeat(autofit, 1fr)"
+            >
               {roles.map((role) => (
                 <GridItem key={role.id}>
-                  <DisplayRoleBox {...role} />
+                  <DisplayRoleBox
+                    {...role}
+                    isActive={role.disabled?.(isOpen)}
+                  />
                 </GridItem>
               ))}
             </Grid>

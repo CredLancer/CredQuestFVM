@@ -11,6 +11,12 @@ import {
   SkeletonCircle,
   HStack,
   VStack,
+  Spinner,
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
 import Head from "next/head";
@@ -18,125 +24,86 @@ import styles from "../styles/Home.module.css";
 import { useAccount, useSendTransaction } from "wagmi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { useState } from "react";
+import { useQuery } from "react-query";
 import { SelectRoleModal } from "../../components/Modals/SelectRole";
 import { useRouter } from "next/router";
+import { OrganizationService } from "../../services/organization.service";
+import {
+  LancerUserProfileView,
+  OrganizationUserProfileView,
+} from "../../components/views";
+import { LancerService } from "../../services";
 
 const UserProfile: NextPage = () => {
   const router = useRouter();
+  const { address } = useAccount();
+  const { data } = useQuery(
+    ["organization.address", address],
+    () => OrganizationService.findOrganizationByAddress(`${address}`),
+    {
+      enabled: !!address,
+      retry: 2,
+    }
+  );
+  const { data: lancer, isLoading: loadingLancer } = useQuery(
+    ["lancer.profile", address],
+    () => LancerService.fecthLancer(address ?? ""),
+    {
+      enabled: !!address,
+      retry: 2,
+    }
+  );
 
   return (
     <Box bgGradient="linear(#71DCCC 0%, #E8EDF6 25%, #71DCCC 75%)" minH="3xl">
-      <Container maxW="6xl" paddingY="2em">
+      <Container maxW="6xl" padding="2em">
         <Box
           maxW="100%"
           marginX="auto"
           mt="12"
           border="1px solid white"
           bg="#29116C"
+          pb="10"
         >
           <Flex
             backgroundColor="white"
             alignItems="flex-end"
             justifyContent="space-between"
-            padding="10px"
+            paddingX="20px"
+            paddingY="10px"
           >
             <Heading color="black" fontSize="large" as="h4">
               My Profile
             </Heading>
 
             <Button
-              onClick={() => router.push("/profile/update")}
+              onClick={() =>
+                router.push(`/profile/update?user=${router.query.user}`)
+              }
               variant="link"
             >
-              Edit Profile
+              {router.query.user === "org"
+                ? data?.org
+                  ? "Edit Profile"
+                  : "Create Profile"
+                : null}
+
+              {router.query.user === "lancer"
+                ? lancer?.registered
+                  ? "Edit Profile"
+                  : "Create Profile"
+                : null}
             </Button>
           </Flex>
 
-          <Grid
-            gridTemplateColumns="1fr auto"
-            justifyContent="space-between"
-            gap="2em"
-            p="2em"
-          >
-            <GridItem>
-              <Grid
-                gridTemplateColumns="150px 1fr"
-                alignItems="stretch"
-                gap="1em"
-                justifyContent="space-between"
-              >
-                <GridItem>
-                  <Heading as="h3" textAlign="center">
-                    Bit Dao
-                  </Heading>
-                </GridItem>
-                <GridItem justifySelf="flex-end">
-                  <Button colorScheme="teal">Add to Favorites</Button>
-                </GridItem>
-                <GridItem alignSelf="center">
-                  <SkeletonCircle
-                    size="20"
-                    m="auto"
-                    startColor="pink.500"
-                    endColor="orange.500"
-                  />
-                </GridItem>
-                <GridItem>
-                  <Box>
-                    <Heading>Industry</Heading>
-                    <Text>
-                      Creating In-game graphics, audio engineering, VR
-                    </Text>
-                  </Box>
-                </GridItem>
-              </Grid>
-            </GridItem>
+          {router.query.user === "org" && <OrganizationUserProfileView />}
 
-            <GridItem alignSelf="center" justifySelf="center">
-              <VStack>
-                <Button
-                  onClick={() => router.push("create-quest")}
-                  colorScheme="blue"
-                >
-                  Create Quest
-                </Button>
-                <Button
-                  onClick={() => router.push("quests")}
-                  colorScheme="blue"
-                  variant="outline"
-                >
-                  View Quests
-                </Button>
-              </VStack>
-            </GridItem>
-          </Grid>
-
-          <HStack spacing="24px" bg="#71DCCC" p="4" mx="6" my="10">
-            <Box w="fit-content">
-              <VStack>
-                <Text fontWeight="extrabold">43.5k</Text>
-                <Text>Twitter Followers</Text>
-              </VStack>
-            </Box>
-            <Box w="fit-content">
-              <VStack>
-                <Text fontWeight="extrabold">0</Text>
-                <Text>Discord Members</Text>
-              </VStack>
-            </Box>
-            <Box w="fit-content">
-              <VStack>
-                <Text fontWeight="extrabold">0k</Text>
-                <Text>Holders</Text>
-              </VStack>
-            </Box>
-            <Box w="fit-content">
-              <VStack>
-                <Text fontWeight="extrabold">50.5k</Text>
-                <Text>Transactions</Text>
-              </VStack>
-            </Box>
-          </HStack>
+          {router.query.user === "lancer" && (
+            <LancerUserProfileView
+              isLoading={loadingLancer}
+              lancer={lancer?.lancer}
+            />
+          )}
         </Box>
       </Container>
     </Box>

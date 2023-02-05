@@ -31,7 +31,7 @@ model Organization {
   name                     String
   imageCID                 String
   imageURL                 String?
-  description              String?
+  description              String?                    @db.LongText
   video                    String?
   blockNumber              Int?
   email                    String?
@@ -80,13 +80,13 @@ model Skill {
 model QuestFile {
   cid         String  @id
   title       String
-  description String
+  description String  @db.LongText
   skills      Skill[]
 }
 
 model ProposalFile {
   cid                  String   @id
-  description          String
+  description          String   @db.LongText
   approxCompletionTime DateTime
 }
 
@@ -108,7 +108,7 @@ model Proposal {
   id          String         @id
   proposer    String
   blockNumber Int
-  description String?
+  description String?        @db.LongText
   fileCID     String
   workCID     String?
   status      ProposalStatus @default(Proposed)
@@ -151,7 +151,7 @@ model Lancer {
   imageCID    String?
   email       String?
   name        String?
-  description String?
+  description String? @db.LongText
   registered  Boolean @default(false)
 
   Credential Credential[]
