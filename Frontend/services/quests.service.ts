@@ -24,4 +24,12 @@ export class QuestService {
       method: "GET",
     }).then((res) => res.json());
   }
+
+  static async fetchQuestById(id: string) {
+    return fetch(`${BASE_URL}/quest/${id}`, {
+      method: "GET",
+    }).then((res) => res.json());
+  }
+
+
 }
