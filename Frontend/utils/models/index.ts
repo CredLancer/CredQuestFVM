@@ -1,1 +1,2 @@
-export * from "./quest"
+export * from "./quest";
+export * from "./proposals";
