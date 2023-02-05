@@ -9,6 +9,8 @@ import { Web3Provider } from "../providers/Web3";
 import { ChakraProvider } from "../providers/Chakra";
 import QueryClientProvider from "../providers/Query";
 import { QuestContext } from "../providers/Quest";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const isMounted = useIsMounted();
@@ -22,6 +24,8 @@ function MyApp({ Component, pageProps }: AppProps) {
               <Page>
                 <Component {...pageProps} />
               </Page>
+
+              <ToastContainer />
             </QuestContext>
           )}
         </ChakraProvider>

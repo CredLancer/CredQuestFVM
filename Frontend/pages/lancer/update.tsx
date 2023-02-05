@@ -1,51 +1,30 @@
 import {
   Box,
   Button,
-  Container,
   Flex,
   Grid,
   GridItem,
   Heading,
   Text,
-  Link,
-  SkeletonCircle,
-  HStack,
   VStack,
   Square,
   Input,
   FormLabel,
   VisuallyHiddenInput,
   FormControl,
-  Select,
   Spinner,
 } from "@chakra-ui/react";
 import type { NextPage } from "next";
-import ORGANIZATION_ABI from "../../assets/contracts/OrganizationController.json";
-import {
-  useAccount,
-  useContract,
-  useContractWrite,
-  usePrepareContractWrite,
-  useProvider,
-  useSendTransaction,
-  useSigner,
-  useWebSocketProvider,
-} from "wagmi";
-import { BigNumber } from "@ethersproject/bignumber";
-import { ChangeEvent, useMemo, useState } from "react";
-import { useRouter } from "next/router";
+import { useAccount, useSignMessage } from "wagmi";
+import { ChangeEvent, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation } from "react-query";
-import { LancerService } from "../../services/lancer.service";
+import { LancerService } from "../../services";
 import Image from "next/image";
-//import { ORGANIZATION_CONTRACT } from "../../utils/constants";
 import { InternalNavigationPage } from "../../components/Page/InternalPage";
-
-import { useSignMessage } from 'wagmi'
-import { verifyMessage } from 'ethers/lib/utils'
+import { verifyMessage } from "ethers/lib/utils";
 import { useQuery } from "react-query";
-
-import { BASE_URL } from "../../utils/constants";
+import { toast } from "react-toastify";
 
 type LogoInfo = {
   size: number;
@@ -54,88 +33,66 @@ type LogoInfo = {
 };
 
 const LancerProfile: NextPage = () => {
-
   const { address } = useAccount();
-  //const { data: signer } = useSigner();
-  const provider = useWebSocketProvider();
-  // const contract = useContract({
-  //   address: ORGANIZATION_CONTRACT,
-  //   abi: ORGANIZATION_ABI,
-  //   signerOrProvider: signer,
-  // });
-
-
-  //console.log(data);
-
-  const {
-    mutate,
-    data: profile_data,
-    isLoading: isSubmitting,
-  } = useMutation(LancerService.createLancerProfile);
-
+  const { data: lancerSignatureOrProfile } = useQuery(
+    ["lancer.signature|profile", address],
+    () => LancerService.fetchLancerSignatureOrProfile(address ?? ""),
+    {
+      enabled: !!address,
+      retry: 2,
+    }
+  );
+  const { mutate, isLoading: isSubmitting } = useMutation(
+    LancerService.createLancerProfile
+  );
   const { handleSubmit, register, setValue } = useForm();
   const [uploadedLogo, setUploadedLogo] = useState<LogoInfo>();
 
-  //const [signMsg, setSignMsg] = useState<signer>();
-
-  const { data, error, isLoading, signMessage } = useSignMessage({
-    onSuccess(data, variables, resultData) {
+  const { isLoading, signMessage } = useSignMessage({
+    onSuccess(data, variables) {
       // Verify signature when sign message succeeds
-      const address = verifyMessage(variables.message, data)
-      //setSignMsg(data);
-      console.log(data);
-      var value = data;
-      //postLancer(value);
+      const address = verifyMessage(variables.message, data);
+      console.log({ address, data });
+      console.log(data, variables);
+      console.log({ lancerData: variables });
+      postLancer({ ...variables, signature: data });
     },
-  })
+  });
 
-  const postLancer = async (value: any, model: any ) => {
-
-    console.log(value);
-    console.log(model);
-
+  const postLancer = async ({ signature, ...model }: any) => {
     const formData = new FormData();
     formData.append("image", model.lancer_logo);
     formData.append("name", `${model.lancer_name}`);
     formData.append("description", model.lancer_description);
     formData.append("email", model.email);
-    //formData.append("address", address);
-    formData.append("signature", "");
-    mutate(formData, {
-      onSuccess: async (response) => {
-        console.log({ response });
-        const { name, imageCID, signature, nonce } = response;
-        // contract?.createOrganization(name, imageCID, signature, nonce, {
-        //   maxPriorityFeePerGas: await (provider as any)?.send(
-        //     "eth_maxPriorityFeePerGas",
-        //     []
-        //   ),
-        // });
-      },
-    });    
+    formData.append("signature", signature);
+    formData.append("address", `${address}`);
 
+    mutate(formData, {
+      onSuccess: () => {
+        toast.success("Lancer Creates Successfully");
+      },
+      onError: () => {
+        toast.error("Failed to create lancer");
+      },
+    });
   };
 
   const onSubmit = async (model: any) => {
     console.log({ model });
 
-
-    if (!address) {
-      alert("Please connect your wallet");
+    if (!lancerSignatureOrProfile) {
+      alert("There was a problem with your request!");
       return;
     }
 
-    const res = await fetch(`${BASE_URL}/lancer/${address}`);
-		const data = await res.json();
-		console.log(data);
-    const message = data.message;
+    if (lancerSignatureOrProfile.isRegistered) {
+      toast("Lancer exists with this address!");
+      return;
+    }
 
-    await signMessage({ message });
-
-
+    signMessage({ ...model, message: lancerSignatureOrProfile.message });
   };
-
-  //console.log({ provider, signer });
 
   const handleFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -269,12 +226,11 @@ const LancerProfile: NextPage = () => {
             </FormControl>
           </GridItem>
 
-          <GridItem colSpan={1}>
-          </GridItem>
+          <GridItem colSpan={1}></GridItem>
 
           <GridItem colSpan={4}>
             <Button width="100%" type="submit" colorScheme="purple">
-              {isSubmitting ? <Spinner /> : "CREATE"}
+              {isSubmitting || isLoading ? <Spinner /> : "CREATE"}
             </Button>
           </GridItem>
         </Grid>
