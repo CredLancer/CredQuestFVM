@@ -20,6 +20,7 @@ import { useQuestContext } from "../../providers/Quest";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { CreateProposalModal } from "../Modals";
 
 interface ComponentProps extends QuestResponse {
   handleUpdate: (quest?: QuestResponse) => void;
@@ -41,6 +42,21 @@ export const ViewSingleQuest: React.FC<QuestResponse> = ({ ...quest }) => {
       enabled: !!orgId,
     }
   );
+  const { data: userAsOrg } = useQuery(
+    ["organization.address", address],
+    () => OrganizationService.findOrganizationByAddress(address ?? ""),
+    {
+      enabled: !!address,
+    }
+  );
+  const { data: lancer } = useQuery(
+    ["lancer.profile", address],
+    () => LancerService.fecthLancer(address ?? ""),
+    {
+      enabled: !!address,
+      retry: 2,
+    }
+  );
   useEffect(() => {
     const fetchData = async () => {
       if (organization?.org) {
@@ -48,7 +64,7 @@ export const ViewSingleQuest: React.FC<QuestResponse> = ({ ...quest }) => {
           organization.org.imageCID
         );
         console.log({ imageData: image.data });
-        setImage(image.data.upload[0] as any);
+        // setImage(image.data.upload[0] as any);
       }
     };
 
@@ -87,13 +103,17 @@ export const ViewSingleQuest: React.FC<QuestResponse> = ({ ...quest }) => {
       </Box>
 
       <VStack>
-        <Button
-          onClick={() => initiateQuestUpdate()}
-          colorScheme="pink"
-          w="100%"
-        >
-          Update
-        </Button>
+        {lancer?.registered && orgId !== userAsOrg?.org?.id ? (
+          <CreateProposalModal questId={id} />
+        ) : (
+          <Button
+            onClick={() => initiateQuestUpdate()}
+            colorScheme="pink"
+            w="100%"
+          >
+            Update
+          </Button>
+        )}
 
         <Button onClick={() => console.log({ id })} colorScheme="teal" w="100%">
           View

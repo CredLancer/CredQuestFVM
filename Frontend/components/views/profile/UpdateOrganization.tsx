@@ -83,10 +83,10 @@ export const UpdateOrganizationProfile = () => {
         console.log({ response });
         const { name, imageCID, signature, nonce } = response;
         contract?.createOrganization(name, imageCID, signature, nonce, {
-          // maxPriorityFeePerGas: await provider?.send(
-          //   "eth_maxPriorityFeePerGas",
-          //   []
-          // ),
+          maxPriorityFeePerGas: await provider?.send(
+            "eth_maxPriorityFeePerGas",
+            []
+          ),
         });
       },
     });
