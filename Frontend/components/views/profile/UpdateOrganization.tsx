@@ -160,6 +160,7 @@ export const UpdateOrganizationProfile = () => {
                 )}
                 <VisuallyHiddenInput
                   name="org_logo"
+                  accept="jpg, png"
                   onChange={handleFileUpload}
                   type="file"
                 />

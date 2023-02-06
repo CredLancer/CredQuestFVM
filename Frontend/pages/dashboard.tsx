@@ -24,10 +24,10 @@ import {
   AccordionIcon,
   AccordionPanel,
   Accordion,
+  Circle,
 } from "@chakra-ui/react";
+import LancerJane from "../assets/pngs/lancer-jane.jpeg";
 import type { NextPage } from "next";
-import Head from "next/head";
-import styles from "../styles/Home.module.css";
 import { useAccount, useSendTransaction } from "wagmi";
 import { BigNumber } from "@ethersproject/bignumber";
 import { useMemo, useState } from "react";
@@ -43,6 +43,7 @@ import {
   QuestService,
 } from "../services";
 import { ProposalStatus } from "../utils/models";
+import Image from "next/image";
 
 interface CompletedQuest {
   cid: string;
@@ -131,13 +132,15 @@ const Dashboard: NextPage = () => {
                         _hover={{ bg: "#321975" }}
                       >
                         <Box as="span" flex="1" textAlign="left">
-                          Member Creds
+                          {lancer.registered
+                            ? "Background Credentials"
+                            : "Member Credentials"}
                         </Box>
                         <AccordionIcon />
                       </AccordionButton>
                     </h2>
                     <AccordionPanel bg="#E8EDF6" py={10} px="24" color="black">
-                      Member Credentials
+                      <Box color="red">There are no Credentials</Box>
                     </AccordionPanel>
                   </AccordionItem>
 
@@ -179,28 +182,44 @@ const Dashboard: NextPage = () => {
                                   borderColor={"#9771ff"}
                                   borderWidth={"5px"}
                                   key={id}
+                                  py="4"
                                   // w={"200px"}
-                                  h={"300px"}
+                                  // h={"300px"}
                                   rounded={"25px"}
                                   overflow="hidden"
                                 >
                                   <VStack pt="15px" px="20px" align={"start"}>
                                     <Logo width="150" height="50" />
-                                    <Box
+                                    <Flex
                                       rounded={"50px"}
                                       p="2"
+                                      alignItems="center"
+                                      justifyContent="center"
+                                      gap="3"
                                       minW="150px"
-                                      bg="#9771ff"
+                                      w="100%"
                                       noOfLines={1}
                                     >
-                                      {title}
-                                    </Box>
+                                      <Circle
+                                        mx="auto"
+                                        fontSize="xl"
+                                        bg="yellow.400"
+                                        size="20"
+                                      >
+                                        {organization.org.name
+                                          .slice(0, 3)
+                                          .toUpperCase()}{" "}
+                                      </Circle>
+                                    </Flex>
                                     <Text
                                       color="white"
                                       fontSize={"10px"}
                                       textAlign="start"
                                     >
-                                      Issue by: {organization.org.name}
+                                      Issue by:
+                                      <strong style={{ fontSize: "20px" }}>
+                                        {organization.org.name}{" "}
+                                      </strong>
                                     </Text>
                                     <Text
                                       color="white"
@@ -208,14 +227,21 @@ const Dashboard: NextPage = () => {
                                       textAlign="start"
                                     >
                                       Issue Date:{" "}
-                                      {new Date(deadline).toLocaleDateString()}
+                                      <strong style={{ fontSize: "14px" }}>
+                                        {new Date(
+                                          deadline
+                                        ).toLocaleDateString()}
+                                      </strong>
                                     </Text>
                                     <Text
                                       color="white"
                                       fontSize={"10px"}
                                       textAlign="start"
                                     >
-                                      Hours Completed: {100}
+                                      Hours Completed:{" "}
+                                      <strong style={{ fontSize: "20px" }}>
+                                        {100}
+                                      </strong>
                                     </Text>
                                     <Text
                                       color="white"
@@ -224,9 +250,11 @@ const Dashboard: NextPage = () => {
                                       noOfLines={4}
                                     >
                                       Skills:{" "}
-                                      {skills
-                                        .map(({ title }) => title)
-                                        .join(", ")}
+                                      <strong style={{ fontSize: "12px" }}>
+                                        {skills
+                                          .map(({ title }) => title)
+                                          .join(", ")}
+                                      </strong>
                                     </Text>
                                   </VStack>
                                 </GridItem>
@@ -286,28 +314,45 @@ const Dashboard: NextPage = () => {
                                   borderColor={"#9771ff"}
                                   borderWidth={"5px"}
                                   key={questId}
+                                  py="3"
                                   // w={"200px"}
-                                  h={"300px"}
+                                  // h={"300px"}
                                   rounded={"25px"}
                                   overflow="hidden"
                                 >
                                   <VStack pt="15px" px="20px" align={"start"}>
                                     <Logo width="150" height="50" />
-                                    <Box
+                                    <Flex
                                       rounded={"50px"}
                                       p="2"
+                                      alignItems="center"
+                                      justifyContent="center"
+                                      gap="3"
                                       minW="150px"
-                                      bg="#9771ff"
+                                      w="100%"
                                       noOfLines={1}
                                     >
-                                      {data?.title}
-                                    </Box>
+                                      <Circle
+                                        mx="auto"
+                                        fontSize="xl"
+                                        bg="yellow.400"
+                                        size="20"
+                                      >
+                                        {organization.org.name
+                                          .slice(0, 3)
+                                          .toUpperCase()}{" "}
+                                      </Circle>
+                                    </Flex>
+
                                     <Text
                                       color="white"
                                       fontSize={"10px"}
                                       textAlign="start"
                                     >
-                                      Issue by: {organization.org.name}
+                                      Issue by:
+                                      <strong style={{ fontSize: "20px" }}>
+                                        {organization.org.name}
+                                      </strong>
                                     </Text>
                                     <Text
                                       color="white"
@@ -315,14 +360,21 @@ const Dashboard: NextPage = () => {
                                       textAlign="start"
                                     >
                                       Issue Date:{" "}
-                                      {new Date(deadline).toLocaleDateString()}
+                                      <strong style={{ fontSize: "14px" }}>
+                                        {new Date(
+                                          deadline
+                                        ).toLocaleDateString()}
+                                      </strong>
                                     </Text>
                                     <Text
                                       color="white"
                                       fontSize={"10px"}
                                       textAlign="start"
                                     >
-                                      Hours Completed: {100}
+                                      Hours Completed:
+                                      <strong style={{ fontSize: "14px" }}>
+                                        {100}
+                                      </strong>
                                     </Text>
                                     <Text
                                       color="white"
@@ -330,7 +382,10 @@ const Dashboard: NextPage = () => {
                                       textAlign="start"
                                       noOfLines={4}
                                     >
-                                      Skills: {data?.skills.join(", ")}
+                                      Skills:
+                                      <strong style={{ fontSize: "12px" }}>
+                                        {data?.skills.join(", ")}
+                                      </strong>
                                     </Text>
                                   </VStack>
                                 </GridItem>

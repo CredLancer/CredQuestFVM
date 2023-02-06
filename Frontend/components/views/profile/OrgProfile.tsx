@@ -76,11 +76,11 @@ export const OrganizationUserProfileView = () => {
               <GridItem>
                 <Box pb="4">
                   <Heading as="h2" fontSize="larger">
-                    Web3 Builder & Full-Stack Developer
+                    Wow DAO!
                   </Heading>
                   <Text mt="4" color="#E8EDF6" noOfLines={2}>
                     {data?.org?.description ??
-                      "Creating In-game graphics, audio engineering, VR"}
+                      "Innovative Web3 DAO Community of WOW NFT Holders"}
                   </Text>
                 </Box>
               </GridItem>

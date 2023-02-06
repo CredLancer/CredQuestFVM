@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Circle,
   Flex,
   SkeletonCircle,
   Spinner,
@@ -90,8 +91,10 @@ export const ViewSingleQuest: React.FC<QuestResponse> = ({ ...quest }) => {
     <Flex alignItems="stretch" justifyContent="flex-start" gap="4">
       <Box>
         <SkeletonCircle size="20" isLoaded={!!organization}>
-          <Text>{organization?.org.name}</Text>
-          {/* <Image src={image as any as string} /> */}
+          {/* <Text>{organization?.org.name}</Text> */}
+          <Circle mx="auto" fontSize="xl" bg="blue.400" size="20">
+            {organization?.org?.name.slice(0, 3).toUpperCase()}{" "}
+          </Circle>
         </SkeletonCircle>
       </Box>
 

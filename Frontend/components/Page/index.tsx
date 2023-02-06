@@ -1,5 +1,5 @@
 import React, { FC, useState } from "react";
-import { Box, Flex, HStack, Link, Stack } from "@chakra-ui/layout";
+import { Box, Circle, Flex, HStack, Link, Stack } from "@chakra-ui/layout";
 import Logo from "../../assets/svg/credlancer_logo.svg";
 import NextLink from "next/link";
 import { Header } from "../Header";
@@ -12,12 +12,21 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useRouter } from "next/router";
 import { SelectRoleModal } from "../Modals/SelectRole";
 import { SelectProfileToDisplayModal } from "../Modals";
+import LancerJane from "../../assets/pngs/lancer-jane.jpeg";
+import Image from "next/image";
+import { OrganizationService } from "../../services";
+import { useQuery } from "react-query";
 // import { useWallet } from '../../context/wallet-provider'
 
 export const Page: FC<{ children?: React.ReactNode }> = ({ children }) => {
-  const { isConnected } = useAccount();
+  const { isConnected, address } = useAccount();
   const [openModal, setOpen] = useState(false);
   const router = useRouter();
+  const { data: organization, isLoading } = useQuery(
+    ["organization.address", address],
+    () => OrganizationService.findOrganizationByAddress(`${address}`),
+    { enabled: !!address, retry: 2 }
+  );
 
   if (openModal) {
     return <SelectProfileToDisplayModal handleClose={() => setOpen(false)} />;
@@ -43,9 +52,21 @@ export const Page: FC<{ children?: React.ReactNode }> = ({ children }) => {
 
               <Flex gap="6">
                 {isConnected && (
-                  <Button colorScheme="blue" onClick={() => setOpen(true)}>
-                    Profile
-                  </Button>
+                  <Flex alignItems="stretch" justifyContent="center" gap="3">
+                    <Button colorScheme="blue" onClick={() => setOpen(true)}>
+                      Profile
+                    </Button>
+                    <Circle size="10" bg="yellow.600">
+                      {organization?.org ? null : (
+                        <Image
+                          width="100%"
+                          style={{ borderRadius: "100%" }}
+                          height="100%"
+                          src={LancerJane}
+                        />
+                      )}
+                    </Circle>
+                  </Flex>
                 )}
                 {/* 
                 {isConnected && (

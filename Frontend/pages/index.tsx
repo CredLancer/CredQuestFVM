@@ -41,14 +41,22 @@ const CallToAction = () => {
 
   return (
     <Box padding="12" minH="md" mt="200px">
-      <Heading fontFamily="Alvotica" textAlign="center" color="#9C1EF3">
-        Join a Quest
+      <Heading
+        fontFamily="Alvotica"
+        width="fit-content"
+        textAlign="center"
+        color="#9C1EF3"
+        fontSize="5xl"
+        mx="auto"
+        whiteSpace="nowrap"
+      >
+        Collaborate with Professionals you Verify.
       </Heading>
-      <Heading fontFamily="Alvotica" textAlign="center" color="#9C1EF3">
+      <Heading mt="8" fontFamily="Alvotica" textAlign="center" color="#9C1EF3">
         Find your Soul Bound Tribe
       </Heading>
 
-      <Flex alignItems="center" justifyContent="center" gap="8" marginTop="10">
+      <Flex alignItems="center" justifyContent="center" gap="8" marginTop="16">
         <Button
           onClick={() => !disabled && handleCreateQuest()}
           disabled={disabled}
@@ -75,7 +83,7 @@ const CallToAction = () => {
 const Home: NextPage = () => {
   return (
     <Box bgGradient="linear(#71DCCC 0%, #71DCCC 25%, #29116c 50%, )">
-      <Container>
+      <Container minW="700px">
         <CallToAction />
       </Container>
       <CompletedQuests />

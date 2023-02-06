@@ -62,7 +62,7 @@ export const LancerUserProfileView: React.FC<Props> = ({
               </GridItem>
               <GridItem>
                 <Box>
-                  <Heading>Industry</Heading>
+                  <Heading>Web3 Developer</Heading>
                   <Text>{lancer?.description}</Text>
                 </Box>
               </GridItem>
