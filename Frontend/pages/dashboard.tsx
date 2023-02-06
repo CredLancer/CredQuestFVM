@@ -1,3 +1,5 @@
+import Logo from "../assets/svg/credlancer_logo.svg";
+import LogoCred from "../assets/svg/credlancer-cred.svg";
 import {
   Box,
   Button,
@@ -9,6 +11,7 @@ import {
   Text,
   Link,
   SkeletonCircle,
+  Stack,
   HStack,
   VStack,
   Tabs,
@@ -33,6 +36,17 @@ import { useRouter } from "next/router";
 import { BackHouseLayout } from "../components/Page/BackOfHouseLayout";
 import { DashboardLayout } from "../components/Page/DashboardLayout";
 
+interface MemberCredentials {
+  id: string;
+  href?: string;
+  logo?: string;
+  tagImage?: string;
+  issueBy?: string;
+  hoursCompleted?: number;
+  skills?: string[];
+  issueDate?: string;
+}
+
 const Dashboard: NextPage = () => {
   const { isConnected } = useAccount();
   const router = useRouter();
@@ -48,6 +62,15 @@ const Dashboard: NextPage = () => {
     borderRadius: "0",
     borderColor: "transparent rgba(69, 76, 115, 0.88)",
   };
+
+  const credentials: MemberCredentials[] = [
+    {
+      id: "1",
+    },
+    {
+      id: "2",
+    },
+  ];
 
   return (
     <DashboardLayout>
@@ -69,7 +92,8 @@ const Dashboard: NextPage = () => {
             <TabPanel>
               <Box py="10" px="2">
                 <Accordion allowMultiple allowToggle border="2px solid #E8EDF6">
-                  <AccordionItem>
+
+                  <AccordionItem mb="50px">
                     <h2>
                       <AccordionButton
                         bg="#321975"
@@ -86,6 +110,65 @@ const Dashboard: NextPage = () => {
                       Member Credentials
                     </AccordionPanel>
                   </AccordionItem>
+
+                  <AccordionItem mb="50px">
+                    <h2>
+                      <AccordionButton
+                        bg="#321975"
+                        color="white"
+                        _hover={{ bg: "#321975" }}
+                      >
+                        <Box as="span" flex="1" textAlign="left">
+                          Completed
+                        </Box>
+                        <AccordionIcon />
+                      </AccordionButton>
+                    </h2>
+                    <AccordionPanel bg="#E8EDF6" py={10} px="24" color="black">
+
+                      <Box 
+                        boxShadow='md' 
+                        bgGradient="linear(to-b, #7ea1cb, #2c5683)" 
+                        borderColor={"#9771ff"} 
+                        borderWidth={"5px"}
+                        w={"200px"} 
+                        h={"300px"} 
+                        rounded={"25px"}>
+
+                        <VStack pt="50px" px="20px" align={"start"}>
+                            <Logo width="150" height="50" />
+                            <Box rounded={"50px"} minW="150px" bg="#9771ff">
+                              Uhm
+                            </Box>
+                            <Text color="white" fontSize={"10px"} textAlign="start">Issue by: Developer DAO</Text>
+                            <Text color="white" fontSize={"10px"} textAlign="start">Issue Date: 1/2023</Text>
+                            <Text color="white" fontSize={"10px"} textAlign="start">Hours Completed: 100</Text>
+                            <Text color="white" fontSize={"10px"} textAlign="start">Skills: Skill 1, Skill, Skill 3</Text>
+                        </VStack>
+                      </Box>
+
+                    </AccordionPanel>
+                  </AccordionItem>
+
+                  <AccordionItem mb="50px">
+                    <h2>
+                      <AccordionButton
+                        bg="#321975"
+                        color="white"
+                        _hover={{ bg: "#321975" }}
+                      >
+                        <Box as="span" flex="1" textAlign="left">
+                          Pending
+                        </Box>
+                        <AccordionIcon />
+                      </AccordionButton>
+                    </h2>
+                    <AccordionPanel bg="#E8EDF6" py={10} px="24" color="black">
+                      Quest Pending
+                    </AccordionPanel>
+                  </AccordionItem>
+
+
                 </Accordion>
               </Box>
             </TabPanel>
