@@ -15,7 +15,6 @@ const prisma = new PrismaClient();
 
 workRouter.post(
   "/:proposalId",
-  param("proposalID").isNumeric(),
   body("address").isString(),
   body("signature").isString(),
   body("cid").isHexadecimal(),

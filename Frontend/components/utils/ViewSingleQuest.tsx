@@ -8,25 +8,35 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import { useQuery } from "react-query";
-import { QuestResponse } from "../../utils/models";
+import { ProposalStatus, QuestResponse } from "../../utils/models";
 import {
   QuestService,
   OrganizationService,
   LancerService,
   UtilService,
+  ProposalService,
 } from "../../services";
-import { useAccount } from "wagmi";
+import {
+  useAccount,
+  useContract,
+  useSigner,
+  useWebSocketProvider,
+} from "wagmi";
 import { useQuestContext } from "../../providers/Quest";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CreateProposalModal, ViewQuestInfoModal } from "../Modals";
+import { SubmitWorkView } from "./SubmitWork";
+import { QUEST_CONTRACT } from "../../utils/constants";
+import QUEST_ABI from "../../assets/contracts/QuestController.json";
 
 interface ComponentProps extends QuestResponse {
   handleUpdate: (quest?: QuestResponse) => void;
 }
 
 export const ViewSingleQuest: React.FC<QuestResponse> = ({ ...quest }) => {
+  console.log({ currentQuest: quest });
   const { updateSelectedQuest, updateEditQuestStatus } = useQuestContext()!;
   const router = useRouter();
   const { address } = useAccount();
@@ -56,25 +66,25 @@ export const ViewSingleQuest: React.FC<QuestResponse> = ({ ...quest }) => {
       retry: 2,
     }
   );
-  useEffect(() => {
-    const fetchData = async () => {
-      if (organization?.org) {
-        const image = await UtilService.fetchLightHouseImage(
-          organization.org.imageCID
-        );
-        console.log({ imageData: image.data });
-        // setImage(image.data.upload[0] as any);
-      }
-    };
-
-    fetchData();
-  }, [organization?.org]);
+  const { data: proposal } = useQuery(
+    ["lancer.proposal", address],
+    () => ProposalService.fetchProposalsFromLancer(`${address}`),
+    {
+      enabled: !!address,
+    }
+  );
   const initiateQuestUpdate = () => {
     updateSelectedQuest(quest);
     updateEditQuestStatus(true);
     router.push("/quests?tab=1");
   };
-  console.log({ lancer });
+  const canSubmitProposal = () => {
+    const isExisting = proposal?.proposals?.find(
+      ({ questId }) => questId === `${id}`
+    );
+    return !!isExisting && isExisting.status === ProposalStatus.Accepted;
+  };
+  console.log({ proposal });
 
   return isLoading ? (
     <Spinner />
@@ -103,7 +113,11 @@ export const ViewSingleQuest: React.FC<QuestResponse> = ({ ...quest }) => {
 
       <VStack>
         {lancer?.registered && orgId !== userAsOrg?.org?.id ? (
-          <CreateProposalModal questId={id} />
+          canSubmitProposal() ? (
+            <SubmitWorkView {...quest} />
+          ) : (
+            <CreateProposalModal proposals={proposal?.proposals} questId={id} />
+          )
         ) : (
           <Button
             onClick={() => initiateQuestUpdate()}

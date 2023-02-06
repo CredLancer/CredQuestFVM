@@ -41,7 +41,6 @@ export const ListQuestsView = () => {
     QuestService.fetchQuests()
   );
 
-  console.log({ data, org, allQuests });
   return isLoading ? (
     <Flex alignItems="center" justifyContent="center">
       <Spinner size="md" />

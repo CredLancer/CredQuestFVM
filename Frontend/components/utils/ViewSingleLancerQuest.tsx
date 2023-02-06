@@ -22,13 +22,24 @@ import {
     deadline?: number;
   }
   
-  export const ViewSingleLancerQuest: React.FC<ComponentProps> = ({ questCID, id }) => {
-    const { data, isLoading } = useQuery([`Quest-${id}`, questCID], () =>
+  export const ViewSingleLancerQuest: React.FC<ComponentProps> = (quest: ComponentProps) => {
+
+    const questCID = quest.questCID;
+    const questID = quest.id;
+    const isOpen : boolean = (quest.status == 'Open');
+
+    const { data, isLoading } = useQuery([`Quest-${questID}`, questCID], () =>
       QuestService.fetchQuestByCID(questCID)
     );
-  
-    console.log({ data });
-  
+
+    const applyQuest = (input: string) => {
+      console.log(input);
+    } 
+
+    const completeQuest = (input: string) => {
+      console.log(input);
+    } 
+    
     return isLoading ? (
       <Spinner />
     ) : (
@@ -52,16 +63,28 @@ import {
         </Box>
   
         <VStack>
-  
-          <Button
-            onClick={() => console.log({ questCID })}
+          <span>{isOpen}</span>
+          { isOpen ? 
+          (<Button
+            onClick={() => applyQuest(questCID)}
             colorScheme="pink"
             w="100%"
           >
             Apply
+          </Button>) 
+          : (
+            <Button
+            onClick={() => completeQuest(questCID)}
+            colorScheme="pink"
+            w="100%"
+          >
+            Complete
           </Button>
+          )
           
-          <Button onClick={() => console.log({ id })} colorScheme="teal" w="100%">
+            }
+          
+          <Button onClick={() => console.log({ questID })} colorScheme="teal" w="100%">
             View
           </Button>
         </VStack>

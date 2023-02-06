@@ -36,4 +36,14 @@ export class ProposalService {
       },
     }).then((res) => res.json());
   }
+
+  static async submitWork({ proposalID, ...model }: any) {
+    return fetch(`${BASE_URL}/work/${proposalID}`, {
+      method: "POST",
+      body: JSON.stringify(model),
+      headers: {
+        "content-type": "application/json",
+      },
+    }).then((res) => res.json());
+  }
 }

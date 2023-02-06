@@ -22,7 +22,9 @@ import {
       { retry: 2 }
     );
   
+    console.log("ListLancerQuestsView");
     console.log({ data });
+
     return isLoading ? (
       <Flex alignItems="center" justifyContent="center">
         <Spinner size="md" />

@@ -19,7 +19,7 @@ import {
   Textarea,
   useDisclosure,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import QUEST_ABI from "../../assets/contracts/QuestController.json";
 import { toast } from "react-toastify";
@@ -34,11 +34,16 @@ import {
 import { LancerService, ProposalService } from "../../services";
 import { ORGANIZATION_CONTRACT, QUEST_CONTRACT } from "../../utils/constants";
 import { useQuery } from "react-query";
+import { LancerProposal, ProposalStatus } from "../../utils/models";
 
 interface Props {
   questId: number;
+  proposals?: LancerProposal[];
 }
-export const CreateProposalModal: React.FC<Props> = ({ questId }) => {
+export const CreateProposalModal: React.FC<Props> = ({
+  questId,
+  proposals,
+}) => {
   const { address } = useAccount();
   const { register, handleSubmit } = useForm();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -60,13 +65,22 @@ export const CreateProposalModal: React.FC<Props> = ({ questId }) => {
     abi: QUEST_ABI,
     signerOrProvider: signer,
   });
-  const { isLoading, signMessage } = useSignMessage({
+  const { signMessage } = useSignMessage({
     async onSuccess(data, variables) {
       console.log(data, variables);
       console.log({ lancerData: variables });
       await createProposal({ ...variables, signature: data });
     },
   });
+  const canApply = useMemo(() => {
+    const currentQuest = proposals?.find(
+      ({ quest }) => quest.id === `${questId}`
+    );
+
+    if (!currentQuest) {
+      return true;
+    }
+  }, [questId, proposals]);
 
   const onSubmit = async (data: any) => {
     if (!address) {
@@ -107,9 +121,11 @@ export const CreateProposalModal: React.FC<Props> = ({ questId }) => {
 
   return (
     <>
-      <Button onClick={() => onOpen()} colorScheme="pink" w="100%">
-        Apply
-      </Button>
+      {canApply && (
+        <Button onClick={() => onOpen()} colorScheme="pink" w="100%">
+          Apply
+        </Button>
+      )}
       <Modal
         isCentered
         closeOnOverlayClick={false}
