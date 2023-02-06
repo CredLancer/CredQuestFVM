@@ -84,6 +84,7 @@ export const ViewSingleQuest: React.FC<QuestResponse> = ({ ...quest }) => {
     );
     return !!isExisting && isExisting.status === ProposalStatus.Accepted;
   };
+  console.log({ proposal });
 
   return isLoading ? (
     <Spinner />
@@ -115,7 +116,7 @@ export const ViewSingleQuest: React.FC<QuestResponse> = ({ ...quest }) => {
           canSubmitProposal() ? (
             <SubmitWorkView {...quest} />
           ) : (
-            <CreateProposalModal questId={id} />
+            <CreateProposalModal proposals={proposal?.proposals} questId={id} />
           )
         ) : (
           <Button
