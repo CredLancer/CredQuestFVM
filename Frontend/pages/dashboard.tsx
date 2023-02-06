@@ -156,79 +156,84 @@ const Dashboard: NextPage = () => {
                     </h2>
                     <AccordionPanel bg="#E8EDF6" py={10} px="24" color="black">
                       {credentials?.length ? (
-                        credentials.map(
-                          ({ id, orgId, deadline, skills, title }) => {
-                            const { data: organization } = useQuery(
-                              ["organization.id", orgId],
-                              () =>
-                                OrganizationService.findOrganizationById(
-                                  Number(orgId)
-                                ),
-                              {
-                                enabled: !!orgId,
-                              }
-                            );
-                            return (
-                              <Box
-                                boxShadow="md"
-                                bgGradient="linear(to-b, #7ea1cb, #2c5683)"
-                                borderColor={"#9771ff"}
-                                borderWidth={"5px"}
-                                key={id}
-                                w={"200px"}
-                                h={"300px"}
-                                rounded={"25px"}
-                                overflow="hidden"
-                              >
-                                <VStack pt="15px" px="20px" align={"start"}>
-                                  <Logo width="150" height="50" />
-                                  <Box
-                                    rounded={"50px"}
-                                    p="2"
-                                    minW="150px"
-                                    bg="#9771ff"
-                                    noOfLines={1}
-                                  >
-                                    {title}
-                                  </Box>
-                                  <Text
-                                    color="white"
-                                    fontSize={"10px"}
-                                    textAlign="start"
-                                  >
-                                    Issue by: {organization.org.name}
-                                  </Text>
-                                  <Text
-                                    color="white"
-                                    fontSize={"10px"}
-                                    textAlign="start"
-                                  >
-                                    Issue Date:{" "}
-                                    {new Date(deadline).toLocaleDateString()}
-                                  </Text>
-                                  <Text
-                                    color="white"
-                                    fontSize={"10px"}
-                                    textAlign="start"
-                                  >
-                                    Hours Completed: {100}
-                                  </Text>
-                                  <Text
-                                    color="white"
-                                    fontSize={"10px"}
-                                    textAlign="start"
-                                    noOfLines={4}
-                                  >
-                                    Skills:{" "}
-                                    {skills
-                                      .map(({ title }) => title)
-                                      .join(", ")}
-                                  </Text>
-                                </VStack>
-                              </Box>
-                            );
-                          }
-                        )
+                        <Grid
+                          gridGap="6"
+                          gridTemplateColumns="repeat(auto-fill, minmax(200px, 1fr))"
+                        >
+                          {credentials.map(
+                            ({ id, orgId, deadline, skills, title }) => {
+                              const { data: organization } = useQuery(
+                                ["organization.id", orgId],
+                                () =>
+                                  OrganizationService.findOrganizationById(
+                                    Number(orgId)
+                                  ),
+                                {
+                                  enabled: !!orgId,
+                                }
+                              );
+                              return (
+                                <GridItem
+                                  boxShadow="md"
+                                  bgGradient="linear(to-b, #7ea1cb, #2c5683)"
+                                  borderColor={"#9771ff"}
+                                  borderWidth={"5px"}
+                                  key={id}
+                                  // w={"200px"}
+                                  h={"300px"}
+                                  rounded={"25px"}
+                                  overflow="hidden"
+                                >
+                                  <VStack pt="15px" px="20px" align={"start"}>
+                                    <Logo width="150" height="50" />
+                                    <Box
+                                      rounded={"50px"}
+                                      p="2"
+                                      minW="150px"
+                                      bg="#9771ff"
+                                      noOfLines={1}
+                                    >
+                                      {title}
+                                    </Box>
+                                    <Text
+                                      color="white"
+                                      fontSize={"10px"}
+                                      textAlign="start"
+                                    >
+                                      Issue by: {organization.org.name}
+                                    </Text>
+                                    <Text
+                                      color="white"
+                                      fontSize={"10px"}
+                                      textAlign="start"
+                                    >
+                                      Issue Date:{" "}
+                                      {new Date(deadline).toLocaleDateString()}
+                                    </Text>
+                                    <Text
+                                      color="white"
+                                      fontSize={"10px"}
+                                      textAlign="start"
+                                    >
+                                      Hours Completed: {100}
+                                    </Text>
+                                    <Text
+                                      color="white"
+                                      fontSize={"10px"}
+                                      textAlign="start"
+                                      noOfLines={4}
+                                    >
+                                      Skills:{" "}
+                                      {skills
+                                        .map(({ title }) => title)
+                                        .join(", ")}
+                                    </Text>
+                                  </VStack>
+                                </GridItem>
+                              );
+                            }
+                          )}
+                        </Grid>
                       ) : (
                         <Box color="red" textAlign="center">
                           No Quests Completed Yet
@@ -252,82 +257,87 @@ const Dashboard: NextPage = () => {
                     </h2>
                     <AccordionPanel bg="#E8EDF6" py={10} px="24" color="black">
                       {pendingProposals.length ? (
-                        pendingProposals.map(({ questId, quest, proposer }) => {
-                          const { data: organization } = useQuery(
-                            ["organization.id", quest.orgId],
-                            () =>
-                              OrganizationService.findOrganizationById(
-                                Number(quest.orgId)
-                              ),
-                            {
-                              enabled: !!quest.orgId,
+                        <Grid
+                          gridGap="6"
+                          gridTemplateColumns="repeat(auto-fill, minmax(200px, 1fr))"
+                        >
+                          {pendingProposals.map(
+                            ({ questId, quest, proposer }) => {
+                              const { data: organization } = useQuery(
+                                ["organization.id", quest.orgId],
+                                () =>
+                                  OrganizationService.findOrganizationById(
+                                    Number(quest.orgId)
+                                  ),
+                                {
+                                  enabled: !!quest.orgId,
+                                }
+                              );
+                              const { deadline } = quest;
+                              const { data } = useQuery(
+                                [`Quest-${questId}`, quest.questCID],
+                                () =>
+                                  QuestService.fetchQuestByCID(quest.questCID)
+                              );
+                              return (
+                                <GridItem
+                                  boxShadow="md"
+                                  bgGradient="linear(to-b, #7ea1cb, #2c5683)"
+                                  borderColor={"#9771ff"}
+                                  borderWidth={"5px"}
+                                  key={questId}
+                                  // w={"200px"}
+                                  h={"300px"}
+                                  rounded={"25px"}
+                                  overflow="hidden"
+                                >
+                                  <VStack pt="15px" px="20px" align={"start"}>
+                                    <Logo width="150" height="50" />
+                                    <Box
+                                      rounded={"50px"}
+                                      p="2"
+                                      minW="150px"
+                                      bg="#9771ff"
+                                      noOfLines={1}
+                                    >
+                                      {data?.title}
+                                    </Box>
+                                    <Text
+                                      color="white"
+                                      fontSize={"10px"}
+                                      textAlign="start"
+                                    >
+                                      Issue by: {organization.org.name}
+                                    </Text>
+                                    <Text
+                                      color="white"
+                                      fontSize={"10px"}
+                                      textAlign="start"
+                                    >
+                                      Issue Date:{" "}
+                                      {new Date(deadline).toLocaleDateString()}
+                                    </Text>
+                                    <Text
+                                      color="white"
+                                      fontSize={"10px"}
+                                      textAlign="start"
+                                    >
+                                      Hours Completed: {100}
+                                    </Text>
+                                    <Text
+                                      color="white"
+                                      fontSize={"10px"}
+                                      textAlign="start"
+                                      noOfLines={4}
+                                    >
+                                      Skills: {data?.skills.join(", ")}
+                                    </Text>
+                                  </VStack>
+                                </GridItem>
+                              );
                             }
-                          );
-                          const { deadline } = quest;
-                          const { data } = useQuery(
-                            [`Quest-${questId}`, quest.questCID],
-                            () => QuestService.fetchQuestByCID(quest.questCID)
-                          );
-                          return (
-                            <Box
-                              boxShadow="md"
-                              bgGradient="linear(to-b, #7ea1cb, #2c5683)"
-                              borderColor={"#9771ff"}
-                              borderWidth={"5px"}
-                              key={questId}
-                              w={"200px"}
-                              h={"300px"}
-                              rounded={"25px"}
-                              overflow="hidden"
-                            >
-                              <VStack pt="15px" px="20px" align={"start"}>
-                                <Logo width="150" height="50" />
-                                <Box
-                                  rounded={"50px"}
-                                  p="2"
-                                  minW="150px"
-                                  bg="#9771ff"
-                                  noOfLines={1}
-                                >
-                                  {data?.title}
-                                </Box>
-                                <Text
-                                  color="white"
-                                  fontSize={"10px"}
-                                  textAlign="start"
-                                >
-                                  Issue by: {organization.org.name}
-                                </Text>
-                                <Text
-                                  color="white"
-                                  fontSize={"10px"}
-                                  textAlign="start"
-                                >
-                                  Issue Date:{" "}
-                                  {new Date(deadline).toLocaleDateString()}
-                                </Text>
-                                <Text
-                                  color="white"
-                                  fontSize={"10px"}
-                                  textAlign="start"
-                                >
-                                  Hours Completed: {100}
-                                </Text>
-                                <Text
-                                  color="white"
-                                  fontSize={"10px"}
-                                  textAlign="start"
-                                  noOfLines={4}
-                                >
-                                  Skills:{" "}
-                                  {data?.skills
-                                    .map(({ title }: any) => title)
-                                    .join(", ")}
-                                </Text>
-                              </VStack>
-                            </Box>
-                          );
-                        })
+                          )}
+                        </Grid>
                       ) : (
                         <Box color="red">There are no Pending Quests</Box>
                       )}

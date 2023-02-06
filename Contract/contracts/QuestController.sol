@@ -234,7 +234,7 @@ contract QuestController is Ownable, Pausable, EIP712 {
 
     function submitWork(
         uint256 questId,
-        bytes calldata workCID,
+        bytes calldata workCID, 
         bytes calldata signature,
         uint256 nonce
     ) public {

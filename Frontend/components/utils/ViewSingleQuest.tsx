@@ -36,7 +36,6 @@ interface ComponentProps extends QuestResponse {
 }
 
 export const ViewSingleQuest: React.FC<QuestResponse> = ({ ...quest }) => {
-  console.log({ currentQuest: quest });
   const { updateSelectedQuest, updateEditQuestStatus } = useQuestContext()!;
   const router = useRouter();
   const { address } = useAccount();
@@ -84,7 +83,6 @@ export const ViewSingleQuest: React.FC<QuestResponse> = ({ ...quest }) => {
     );
     return !!isExisting && isExisting.status === ProposalStatus.Accepted;
   };
-  console.log({ proposal });
 
   return isLoading ? (
     <Spinner />

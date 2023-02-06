@@ -63,8 +63,7 @@ export const SubmitWorkView: React.FC<QuestResponse> = ({ ...quest }) => {
   );
   const { mutate } = useMutation(ProposalService.submitWork);
   const { signMessage } = useSignMessage({
-    onSuccess(data, variables) {
-      console.log({ data, variables });
+    onSuccess(data) {
       submitWork(data);
     },
   });
@@ -93,8 +92,6 @@ export const SubmitWorkView: React.FC<QuestResponse> = ({ ...quest }) => {
       },
     });
   };
-
-  console.log({ proposal })
 
   return (
     <Button
