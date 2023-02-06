@@ -9,6 +9,7 @@ import {
   } from "@chakra-ui/react";
   import { useQuery } from "react-query";
   import { QuestService } from "../../services";
+  import { CreateProposalModal, ViewQuestInfoModal, ViewLancerQuestInfoModal} from "../Modals";
   
   interface ComponentProps {
     title: string;
@@ -84,9 +85,12 @@ import {
           
             }
           
-          <Button onClick={() => console.log({ questID })} colorScheme="teal" w="100%">
+          {/* <Button onClick={() => console.log({ questID })} colorScheme="teal" w="100%">
             View
-          </Button>
+          </Button> */}
+
+          <ViewLancerQuestInfoModal questId={questID} />
+
         </VStack>
       </Flex>
     );

@@ -18,7 +18,7 @@ export class ProposalService {
     return fetch(`${BASE_URL}/proposal/questId/${questID}`, {
       method: "GET",
     }).then((res) => res.json());
-  }s
+  }
 
   static async fetchQuestByCID(cid: string) {
     return fetch(`${LIGHTHOUSE_URL}${cid.substring(2)}`, {
