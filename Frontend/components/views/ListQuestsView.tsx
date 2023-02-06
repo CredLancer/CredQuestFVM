@@ -37,16 +37,27 @@ export const ListQuestsView = () => {
       onSuccess: () => updateSelectedQuest(undefined),
     }
   );
+  const { data: allQuests } = useQuery("quests", () =>
+    QuestService.fetchQuests()
+  );
 
-  console.log({ data });
+  console.log({ data, org, allQuests });
   return isLoading ? (
     <Flex alignItems="center" justifyContent="center">
       <Spinner size="md" />
     </Flex>
   ) : (
     <Grid mt="10" gap="6" gridTemplateColumns="1fr 1fr">
-      {data?.quests?.length ? (
-        data.quests.map((quest: any) => (
+      {org?.org ? (
+        data?.quests?.length ? (
+          data.quests.map((quest: any) => (
+            <GridItem colSpan={1} key={quest.id}>
+              <ViewSingleQuest {...quest} />
+            </GridItem>
+          ))
+        ) : null
+      ) : allQuests?.quests?.length ? (
+        allQuests.quests.map((quest: any) => (
           <GridItem colSpan={1} key={quest.id}>
             <ViewSingleQuest {...quest} />
           </GridItem>

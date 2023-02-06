@@ -71,11 +71,25 @@ const ViewSingleProposal: React.FC<SingleProposalProps> = ({ ...proposal }) => {
   };
 
   return (
-    <Grid gridTemplateColumns="7em 1fr 10em">
+    <Grid mt="6" gridTemplateColumns="7em 1fr 10em">
       <GridItem>
         <SkeletonCircle size="20" />
-        <Badge mt="4" colorScheme="blue" p="2">
-          {proposal.status}
+        <Badge
+          mt="4"
+          colorScheme={
+            proposal.status === ProposalStatus.Accepted
+              ? "green"
+              : proposal.status === ProposalStatus.Proposed
+              ? "orange"
+              : proposal.status === ProposalStatus.Rejected
+              ? "red"
+              : "yellow"
+          }
+          p="2"
+        >
+          {proposal.status === ProposalStatus.Accepted && "In Progress"}
+          {proposal.status === ProposalStatus.Proposed &&
+            ProposalStatus.Proposed}
         </Badge>
       </GridItem>
 
@@ -101,13 +115,18 @@ const ViewSingleProposal: React.FC<SingleProposalProps> = ({ ...proposal }) => {
 
             <Button
               w="full"
+              variant="outline"
               onClick={() => manageProposal(proposal.id, "reject")}
-              colorScheme="whiteAlpha"
+              colorScheme="pink"
             >
               Reject
             </Button>
           </VStack>
-        ) : null}
+        ) : (
+          <Badge mt="4" w="full" textAlign="center" colorScheme="blue" p="2">
+            {proposal.status}
+          </Badge>
+        )}
       </GridItem>
     </Grid>
   );
