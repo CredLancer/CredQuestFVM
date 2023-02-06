@@ -65,7 +65,7 @@ export const SubmitWorkView: React.FC<QuestResponse> = ({ ...quest }) => {
   const { signMessage } = useSignMessage({
     onSuccess(data, variables) {
       console.log({ data, variables });
-      submitWork({ signature: data });
+      submitWork(data);
     },
   });
 
@@ -74,24 +74,27 @@ export const SubmitWorkView: React.FC<QuestResponse> = ({ ...quest }) => {
       ({ questId }) => questId === `${quest.id}`
     );
     const model = {
-      proposalId: existingProposal?.id,
+      proposalID: existingProposal?.id,
       address,
       signature,
       cid: existingProposal?.fileCID,
     };
 
     mutate(model, {
-      async onSuccess(response) {
+      onSuccess: async (response) => {
         console.log({ response });
-        // const { name, imageCID, signature, nonce } = response;
-        // contract?.createOrganization(name, imageCID, signature, nonce, {
-        //   maxPriorityFeePerGas: await provider?.send(
-        //     "eth_maxPriorityFeePerGas",
-        //     []
-        //   ),
+        const { signature, nonce } = response;
+        contract?.submitWork(quest.id, model.cid, signature, nonce, {
+          maxPriorityFeePerGas: await provider?.send(
+            "eth_maxPriorityFeePerGas",
+            []
+          ),
+        });
       },
     });
   };
+
+  console.log({ proposal })
 
   return (
     <Button

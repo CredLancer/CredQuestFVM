@@ -16,19 +16,27 @@ import {
   UtilService,
   ProposalService,
 } from "../../services";
-import { useAccount } from "wagmi";
+import {
+  useAccount,
+  useContract,
+  useSigner,
+  useWebSocketProvider,
+} from "wagmi";
 import { useQuestContext } from "../../providers/Quest";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CreateProposalModal, ViewQuestInfoModal } from "../Modals";
 import { SubmitWorkView } from "./SubmitWork";
+import { QUEST_CONTRACT } from "../../utils/constants";
+import QUEST_ABI from "../../assets/contracts/QuestController.json";
 
 interface ComponentProps extends QuestResponse {
   handleUpdate: (quest?: QuestResponse) => void;
 }
 
 export const ViewSingleQuest: React.FC<QuestResponse> = ({ ...quest }) => {
+  console.log({ currentQuest: quest });
   const { updateSelectedQuest, updateEditQuestStatus } = useQuestContext()!;
   const router = useRouter();
   const { address } = useAccount();

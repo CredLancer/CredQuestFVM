@@ -70,6 +70,15 @@ const ViewSingleProposal: React.FC<SingleProposalProps> = ({ ...proposal }) => {
         });
   };
 
+  const acceptWork = async () => {
+    contract?.acceptWork(proposal.id, {
+      maxPriorityFeePerGas: await provider?.send(
+        "eth_maxPriorityFeePerGas",
+        []
+      ),
+    });
+  };
+
   return (
     <Grid mt="6" gridTemplateColumns="7em 1fr 10em">
       <GridItem>
@@ -83,13 +92,14 @@ const ViewSingleProposal: React.FC<SingleProposalProps> = ({ ...proposal }) => {
               ? "orange"
               : proposal.status === ProposalStatus.Rejected
               ? "red"
-              : "yellow"
+              : "purple"
           }
           p="2"
         >
           {proposal.status === ProposalStatus.Accepted && "In Progress"}
           {proposal.status === ProposalStatus.Proposed &&
             ProposalStatus.Proposed}
+          {proposal.status === ProposalStatus.Awarded && ProposalStatus.Awarded}
         </Badge>
       </GridItem>
 
@@ -103,6 +113,27 @@ const ViewSingleProposal: React.FC<SingleProposalProps> = ({ ...proposal }) => {
       </GridItem>
 
       <GridItem>
+        {proposal.workCID && proposal.status === ProposalStatus.Awarded ? (
+          <VStack gap="3">
+            <Badge mt="4" w="full" textAlign="center" colorScheme="green" p="2">
+              Awarded
+            </Badge>
+            <Badge mt="4" w="full" textAlign="center" colorScheme="blue" p="2">
+              Winner: {proposal.proposer.name}
+            </Badge>
+          </VStack>
+        ) : null}
+        {proposal.workCID && proposal.status === ProposalStatus.Accepted ? (
+          <VStack gap="3">
+            <Button onClick={() => acceptWork()} w="full" colorScheme="pink">
+              Approve Work
+            </Button>
+
+            <Badge mt="4" w="full" textAlign="center" colorScheme="blue" p="2">
+              Submitted
+            </Badge>
+          </VStack>
+        ) : null}
         {proposal.status === ProposalStatus.Proposed ? (
           <VStack gap="3">
             <Button
@@ -122,7 +153,7 @@ const ViewSingleProposal: React.FC<SingleProposalProps> = ({ ...proposal }) => {
               Reject
             </Button>
           </VStack>
-        ) : (
+        ) : proposal.workCID ? null : (
           <Badge mt="4" w="full" textAlign="center" colorScheme="blue" p="2">
             {proposal.status}
           </Badge>
@@ -136,24 +167,14 @@ interface Props {
   questId: number;
 }
 export const ViewQuestInfoModal: React.FC<Props> = ({ questId }) => {
-  const { address } = useAccount();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { data: lancerSignatureOrProfile } = useQuery(
-    ["lancer.signature|profile", address],
-    () => LancerService.fetchLancerSignatureOrProfile(address ?? ""),
-    {
-      enabled: !!address,
-    }
-  );
-  const { data: proposal, isLoading } = useQuery(
+  const { data: proposal } = useQuery(
     ["proposal.quest", questId],
     () => ProposalService.fetchProposalsbyQuestId(questId),
     {
       enabled: !!questId,
     }
   );
-
-  console.log({ proposal });
 
   return (
     <>
